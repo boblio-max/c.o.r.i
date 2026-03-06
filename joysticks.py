@@ -1,10 +1,10 @@
 import pygame
-from adafruit_servokit import ServoKit
+# from adafruit_servokit import ServoKit
 import time
 
 pygame.init()
 pygame.joystick.init()
-kit = ServoKit(channels=16)
+# kit = ServoKit(channels=16)
 
 joysticks = []
 for i in range(pygame.joystick.get_count()):
@@ -31,11 +31,11 @@ while running:
                 if clawActive:
                     print("Claw activated")
                     clawActive = True
-                    kit.servo[10].angle = 0
+                    # kit.servo[10].angle = 0
                 else:
                     print("Claw deactivated")
                     clawActive = False
-                    kit.servo[10].angle = 180
+                    # kit.servo[10].angle = 180
             
             elif event.button == 1:
                 if aiMode:
@@ -50,18 +50,31 @@ while running:
                     pass
                 else:
                     originPl = True
-                    kit.servo[10].angle = 180
-                    kit.servo[11].angle = 0
-                    kit.servo[12].angle = 0
-                    kit.servo[13].angle = 0
-                    kit.servo[14].angle = 0
-                    kit.servo[15].angle = 0
+                    # kit.servo[10].angle = 180
+                    # kit.servo[11].angle = 0
+                    # kit.servo[12].angle = 0
+                    # kit.servo[13].angle = 0
+                    # kit.servo[14].angle = 0
+                    # kit.servo[15].angle = 0
                     print("Robot returned to original location")
             
             elif event.button == 3:
+                # kit.servo[10].angle = 40
+                # kit.servo[11].angle = 110
+                # kit.servo[12].angle = 150
+                # kit.servo[13].angle = 80
+                # kit.servo[14].angle = 0
+                # kit.servo[15].angle = 180
+                time.sleep(0.5)
+                # Kit.servo[15].angle = 0
                 
                 
-            
+                # kit.servo[10].angle = 180
+                # kit.servo[11].angle = 135
+                # kit.servo[12].angle = 135
+                # kit.servo[13].angle = 135
+                # kit.servo[14].angle = 180
+                
         elif event.type == pygame.JOYAXISMOTION:
             # event.axis: The axis ID
             # event.value: A float from -1.0 to 1.0 (0.0 is center)
