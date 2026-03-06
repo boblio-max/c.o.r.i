@@ -5,7 +5,7 @@ import time
 pygame.init()
 pygame.joystick.init()
 kit = ServoKit(channels=16)
-
+print("hello")
 joysticks = []
 for i in range(pygame.joystick.get_count()):
     joy = pygame.joystick.Joystick(i)
