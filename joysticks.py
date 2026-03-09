@@ -83,13 +83,13 @@ while running:
             lhorizontal_movement = 0
             rvertical_movement = 0
             if event.axis == 0: # Usually the left horizontal axis
-                lhorizontal_movement = event.value
+                lhorizontal_movement = (event.value + 1)*90
             elif event.axis == 1: # Usually the left vertical axis
-                lvertical_movement = event.value
+                lvertical_movement = (event.value + 1)*90
             elif event.axis == 2:
-                rhorizontal_movement = event.value
+                rhorizontal_movement = (event.value + 1)*90
             else:
-                rvertical_movement = event.value
+                rvertical_movement = (event.value + 1)*90
 
             print(lhorizontal_movement,
             rvertical_movement,
