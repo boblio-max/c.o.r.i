@@ -78,10 +78,23 @@ while running:
         elif event.type == pygame.JOYAXISMOTION:
             # event.axis: The axis ID
             # event.value: A float from -1.0 to 1.0 (0.0 is center)
+            lhorizontal_movement = 0
+            rvertical_movement = 0
+            lhorizontal_movement = 0
+            rvertical_movement = 0
             if event.axis == 0: # Usually the left horizontal axis
-                horizontal_movement = event.value
+                lhorizontal_movement = event.value
             elif event.axis == 1: # Usually the left vertical axis
-                vertical_movement = event.value
+                lvertical_movement = event.value
+            elif event.axis == 2:
+                rhorizontal_movement = event.value
+            else:
+                rvertical_movement = event.value
+
+            print(lhorizontal_movement,
+            rvertical_movement,
+            lhorizontal_movement,
+            rvertical_movement)
             # You can then use horizontal_movement and vertical_movement to move a character
 
         elif event.type == pygame.JOYHATMOTION:
