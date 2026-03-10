@@ -17,7 +17,8 @@ while cap.isOpened():
     success, image = cap.read()
     if not success:
         continue
-
+    width  = cap.get(3)  # float `width`
+    height = cap.get(4)
     image = cv2.flip(image, 1)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
@@ -32,7 +33,7 @@ while cap.isOpened():
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style()
             )
-            print(hand_landmarks[8])
+            
 
     # Display the feed
     cv2.imshow('Hand Tracking', image)
