@@ -33,6 +33,7 @@ while cap.isOpened():
                 mp_drawing_styles.get_default_hand_landmarks_style(),
                 mp_drawing_styles.get_default_hand_connections_style()
             )
+            print(hand_landmarks[8])
             
 
     # Display the feed
