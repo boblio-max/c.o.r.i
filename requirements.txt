@@ -1,0 +1,4 @@
+pygame
+matplotlib
+opencv-python
+mediapipe
