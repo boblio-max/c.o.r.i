@@ -67,8 +67,6 @@ while running:
                 # kit.servo[15].angle = 180
                 time.sleep(0.5)
                 # Kit.servo[15].angle = 0
-                
-                
                 # kit.servo[10].angle = 180
                 # kit.servo[11].angle = 135
                 # kit.servo[12].angle = 135
@@ -76,15 +74,14 @@ while running:
                 # kit.servo[14].angle = 180
                 
         elif event.type == pygame.JOYAXISMOTION:
-            # event.axis: The axis ID
-            # event.value: A float from -1.0 to 1.0 (0.0 is center)
+
             lhorizontal_movement = 0
             rvertical_movement = 0
             lhorizontal_movement = 0
             rvertical_movement = 0
-            if event.axis == 0: # Usually the left horizontal axis
+            if event.axis == 0: 
                 lhorizontal_movement = (event.value + 1)*90
-            elif event.axis == 1: # Usually the left vertical axis
+            elif event.axis == 1: 
                 lvertical_movement = (event.value + 1)*90
             elif event.axis == 2:
                 rhorizontal_movement = (event.value + 1)*90
@@ -95,11 +92,9 @@ while running:
             rvertical_movement,
             lhorizontal_movement,
             rvertical_movement)
-            # You can then use horizontal_movement and vertical_movement to move a character
+    
 
         elif event.type == pygame.JOYHATMOTION:
-            # event.hat: The hat ID
-            # event.value: A tuple (-1, 0, or 1) for X and Y directions (e.g., (0, 1) is Up)
             print(f"Hat {event.hat} moved to position {event.value}")
 
     
