@@ -52,6 +52,10 @@ def update(frame):
     # The set_segments method expects a list of [start_point, end_point] lists
     N = (dx,dy,dz)
     quiver_object.set_segments([[[0, 0, 0], [dx, dy, dz]]])
+    A1 = B1
+    B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
+    quiver1.set_segments([[0,0,0], [B[0],B[1],B[2]]])
+
 
     # You can also update other properties, e.g., the starting point if needed
     # quiver_object.set_offsets(np.array([[start_x, start_y, start_z]]))
