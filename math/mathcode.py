@@ -15,7 +15,7 @@ ax.set_zlim([-5, 5])
 ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
-ax.set_title('3D vector regression code')
+ax.set_title('3D vectors')
 L = 1
 Lm = 1.57079
 A1 = 0
@@ -23,7 +23,7 @@ A2 = 0
 A3 = 0
 A4 = 0
 
-n = input("> ")
+n = "1 1 1"
 
 ns = n.split(" ")
 
@@ -40,10 +40,11 @@ quiver2 = ax.quiver(B[0], B[1], B[2], C[0], C[1], C[2], color='y', label='Elbow 
 quiver3 = ax.quiver(C[0], C[1], C[2], D[0], D[1], D[2], color='r', label='Wrist Vector')
 
 ax.legend()
-
+frame = fig
 # Update function
-def update(frame):
-
+def update(vector):
+    n = vector
+    ns = n.split(" ")
     t = frame * 0.05  
     dx = 4 * np.cos(t)
     dy = 4 * np.sin(t)
@@ -60,7 +61,7 @@ def update(frame):
     # Find A2, A3, A4 from the N vector                   
     r = np.hypot(dx, dy)            
     s = dz                         
-
+    A2, A3, A4 = 0,0,0
     try:
         c2 = (r*r + s*s - 3*L*L) / (2*L*r)      
         if abs(c2) > 1.0:                    
@@ -89,7 +90,7 @@ def update(frame):
     quiver3.set_segments([[C, D]])  
     
     return quiver_object,quiver1, quiver2, quiver3
-anim = animation.FuncAnimation(fig, update, frames=100, interval=50, blit=False)
+anim = animation.FuncAnimation(update, frames=100, interval=50, blit=False)
 
 
 HTML(anim.to_jshtml())
