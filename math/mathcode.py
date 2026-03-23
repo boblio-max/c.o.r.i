@@ -23,13 +23,17 @@ A2 = 0
 A3 = 0
 A4 = 0
 
+n = input("> ")
+
+ns = n.split(" ")
+
 
 A = (0,0,0)
 B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
 C = np.add(B, (L*np.cos(A2 + A3)*np.cos(A1), L*np.cos(A2 + A3)*np.sin(A3), L*np.sin(A2 + A3)))
 D = np.add(C, (L*np.cos(A2 + A3 + A4)*np.cos(A1), L*np.cos(A2 + A3 + A4)*np.sin(A1), L* np.sin(A2 + A3 + A4)))
 
-N = (0,0,0)
+N = (ns[0], ns[1], ns[2])
 quiver_object = ax.quiver(A[0], A[1], A[2], N[0], N[1], N[2], color='r', label='End Vector')
 quiver1 = ax.quiver(A[0], A[1], A[2], B[0], B[1], B[2], color='b', label='Shoulder Vector')
 quiver2 = ax.quiver(B[0], B[1], B[2], C[0], C[1], C[2], color='y', label='Elbow Vector')
