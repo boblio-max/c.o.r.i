@@ -2,7 +2,7 @@ import pygame
 # from adafruit_servokit import ServoKit
 import time
 import matplotlib.pyplot as plt
-from mathcode import update
+from vector import vector
 pygame.init()
 pygame.joystick.init()
 # kit = ServoKit(channels=16)
@@ -67,7 +67,7 @@ while running:
                 # kit.servo[14].angle = 0
                 # kit.servo[15].angle = 180
                 time.sleep(0.5)
-                # Kit.servo[15].angle = 0
+                # kit.servo[15].angle = 0
                 # kit.servo[10].angle = 180
                 # kit.servo[11].angle = 135
                 # kit.servo[12].angle = 135
@@ -87,7 +87,8 @@ while running:
             
             print("3D Vector:", vector)
             vector_pass = f"{vector[0]} {vector[1]} {vector[1]}"
-            update(vector_pass)
+            vec = vector(vector_pass)
+            vec.update()
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 
