@@ -52,7 +52,8 @@ while running:
         text_surface = font.render(f"AI Mode", True, color)
         screen.blit(text_surface, ((width//2) + ((width//2) - 87), 23))
         pygame.draw.rect(screen, WHITE, static_rect, 1)
-    
+
+        
     
     pygame.display.flip()
 

@@ -76,19 +76,19 @@ while running:
                 
         elif event.type == pygame.JOYAXISMOTION:
             
-            vector = [0, 0, 0]
+            vector1 = [0, 0, 0]
 
             if event.axis == 0:
-                vector[0] = event.value * 3
+                vector1[0] = event.value * 3
             elif event.axis == 1:
-                vector[1] = -event.value * 3
+                vector1[1] = -event.value * 3
             elif event.axis == 3:
-                vector[2] = event.value * 3
+                vector1[2] = event.value * 3
             
-            print("3D Vector:", vector)
-            vector_pass = f"{vector[0]} {vector[1]} {vector[1]}"
-            vec = vector(vector_pass)
-            vec.update()
+            print("3D Vector:", vector1)
+            vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
+            vec = vector().update(vector_pass)
+            # vec.update(vector_pass)
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 
