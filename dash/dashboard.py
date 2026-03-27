@@ -4,17 +4,36 @@
 import pygame
 import sys
 from errors import *
+import math
 pygame.init()
 
 
 width, height = 700,700
 screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Static Rect Example")
+pygame.display.set_caption("C.O.R.I DASHBOARD")
 WHITE = (255, 255, 255)
 BLUE = (0,0,255)
 font = pygame.font.SysFont('Arial', 20)
 static_rect = pygame.Rect(10, height//2, (width//2)-10, (height//2)-10)
 logs = ["Hello", "how are you"]
+
+font       = pygame.font.SysFont('Consolas', 18)
+small_font = pygame.font.SysFont('Consolas', 13)
+
+joint_angles = [90, 90, 90, 90, 90, 90]
+
+CIRCLE_R = 65
+col_xs = [width // 6, width // 2.5, width // 1.57]
+row_ys  = [height // 12 + 30, height // 2 - 110]
+circle_positions = []
+for r in range(2):
+    for c in range(3):
+        circle_positions.append((col_xs[c]-5, row_ys[r]))
+        
+joint_labels = []
+for i in range(6):
+    joint_labels.append(f"J{i+1}")
+
 
 
 # Game loop
@@ -28,7 +47,10 @@ while running:
             x,y = pygame.mouse.get_pos()
             if x <= (width//2) + ((width//2) - 100)+ 100 and x >=  (width//2) + ((width//2) - 100):
                 if y <= 60 and y >= 10:
-                    print("AI mode clicked")
+                    if is_clicked:
+                        logs.append("AI Mode Disabled")
+                    else:
+                        logs.append("AI Mode Enabled")
                     is_clicked = not is_clicked
         i = 10
         for line in logs:
@@ -41,10 +63,23 @@ while running:
             color = BLUE
         else:
             color = WHITE
-        
-        err = Error(1)
-        if err.isThrown():
-            logs.append(err.get())
+        for i, (cx, cy) in enumerate(circle_positions):
+            angle_rad = math.radians(joint_angles[i])
+           
+            pygame.draw.circle(screen, WHITE, (cx, cy), CIRCLE_R, 2)
+            
+            nx = cx + CIRCLE_R * math.cos(-angle_rad)
+            ny = cy + CIRCLE_R * math.sin(-angle_rad)
+            pygame.draw.line(screen, WHITE, (cx, cy), (int(nx), int(ny)), 2)
+
+            pygame.draw.circle(screen, WHITE, (cx, cy), 4)
+            
+            lbl = small_font.render(f"{joint_labels[i]}  {joint_angles[i]}°", True, BLUE)
+            screen.blit(lbl, (cx - lbl.get_width() // 2, cy + CIRCLE_R + 6))
+            
+        # err = Error(1)
+        # if err.isThrown():
+        #     logs.append(err.get())
                             
         rect = pygame.Rect((width//2) + ((width//2) - 100), 10, 100, 50)
         pygame.draw.rect(screen, color, rect, 1)
