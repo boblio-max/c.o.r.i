@@ -26,38 +26,33 @@ while running:
 
         # Handle joystick events
         elif event.type == pygame.JOYBUTTONDOWN:
-            print(f"Button {event.button} pressed on Joystick {event.joy}")
             # You can map specific buttons to in-game actions
             if event.button == 0:
                 if clawActive:
-                    print("Claw activated")
-                    clawActive = True
-                    # kit.servo[10].angle = 0
-                else:
                     print("Claw deactivated")
                     clawActive = False
+                    # kit.servo[10].angle = 0
+                else:
+                    print("Claw activated")
+                    clawActive = True
                     # kit.servo[10].angle = 180
             
             elif event.button == 1:
                 if aiMode:
-                     print("AI Mode activated")
-                     aiMode = True
+                     print("AI Mode deactivated")
+                     aiMode = False
                 else:
-                    print("AI Mode deactivated")
-                    aiMode = False
+                    print("AI Mode activated")
+                    aiMode = True
                     
             elif event.button == 2:
-                if originPl:
-                    pass
-                else:
-                    originPl = True
-                    # kit.servo[10].angle = 180
-                    # kit.servo[11].angle = 0
-                    # kit.servo[12].angle = 0
-                    # kit.servo[13].angle = 0
-                    # kit.servo[14].angle = 0
-                    # kit.servo[15].angle = 0
-                    print("Robot returned to original location")
+                # kit.servo[10].angle = 180
+                # kit.servo[11].angle = 0
+                # kit.servo[12].angle = 0
+                # kit.servo[13].angle = 0
+                # kit.servo[14].angle = 0
+                # kit.servo[15].angle = 0
+                print("Robot returned to original location")
             
             elif event.button == 3:
                 # kit.servo[10].angle = 40
@@ -73,7 +68,8 @@ while running:
                 # kit.servo[12].angle = 135
                 # kit.servo[13].angle = 135
                 # kit.servo[14].angle = 180
-                
+                print("Preset position activated")
+
         elif event.type == pygame.JOYAXISMOTION:
             
             vector1 = [0, 0, 0]
@@ -89,7 +85,7 @@ while running:
             vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
             angles = vector().update(vector_pass)
 
-            print("Servo Angles:", angles)
+            # print("Servo Angles:", angles)
             # kit.servo[11].angle = angles['A1']  # base
             # kit.servo[12].angle = angles['A2']  # shoulder
             # kit.servo[13].angle = angles['A3']  # elbow

@@ -5,6 +5,8 @@ import pygame
 import sys
 from errors import *
 import math
+import os
+
 pygame.init()
 
 
@@ -20,18 +22,18 @@ logs = ["Hello", "how are you"]
 font       = pygame.font.SysFont('Consolas', 18)
 small_font = pygame.font.SysFont('Consolas', 13)
 
-joint_angles = [90, 90, 90, 90, 90, 90]
+joint_angles = [90, 180, 90, 90]
 
 CIRCLE_R = 65
-col_xs = [width // 6, width // 2.5, width // 1.57]
+col_xs = [width // 6, width // 2.5]
 row_ys  = [height // 12 + 30, height // 2 - 110]
 circle_positions = []
 for r in range(2):
-    for c in range(3):
+    for c in range(2):
         circle_positions.append((col_xs[c]-5, row_ys[r]))
         
 joint_labels = []
-for i in range(6):
+for i in range(4):
     joint_labels.append(f"J{i+1}")
 
 
@@ -65,7 +67,10 @@ while running:
             color = WHITE
         for i, (cx, cy) in enumerate(circle_positions):
             angle_rad = math.radians(joint_angles[i])
-           
+            if joint_angles[i] >= 180 or joint_angles[i] <= 0:
+                logs.append(Error(17).get())
+                joint_angles[i] = max(1, min(joint_angles[i], 179))
+                
             pygame.draw.circle(screen, WHITE, (cx, cy), CIRCLE_R, 2)
             
             nx = cx + CIRCLE_R * math.cos(-angle_rad)

@@ -54,13 +54,13 @@ class vector:
         dx = float(ns[0]) 
         dy = float(ns[1])
         dz = float(ns[2])
-
+        A2, A3, A4 = 0,0,0
         A1 = np.arctan2(dy,dx)
         B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
 
         r = np.hypot(dx, dy)            
         s = dz                         
-        A2, A3, A4 = 0,0,0
+        
         try:
             c2 = (r*r + s*s - 3*L*L) / (2*L*r)      
             if abs(c2) > 1.0:                    
