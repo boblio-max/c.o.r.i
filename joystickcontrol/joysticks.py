@@ -6,6 +6,16 @@ from vector import vector
 pygame.init()
 pygame.joystick.init()
 # kit = ServoKit(channels=16)
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+
+
+
+
+plt.show()
+
 
 joysticks = []
 for i in range(pygame.joystick.get_count()):
@@ -90,6 +100,8 @@ while running:
             # kit.servo[12].angle = angles['A2']  # shoulder
             # kit.servo[13].angle = angles['A3']  # elbow
             # kit.servo[14].angle = angles['A4']  # wrist
+            print(angles)
+            
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 
