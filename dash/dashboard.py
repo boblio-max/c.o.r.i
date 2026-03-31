@@ -7,12 +7,14 @@ from errors import *
 import math
 import os
 
-pygame.init()
 
+pygame.init()
+pygame.joystick.init()
 
 width, height = 700,700
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("C.O.R.I DASHBOARD")
+
 WHITE = (255, 255, 255)
 BLUE = (0,0,255)
 font = pygame.font.SysFont('Arial', 20)
@@ -37,23 +39,75 @@ for i in range(4):
     joint_labels.append(f"J{i+1}")
 
 
+joysticks = []
+for i in range(pygame.joystick.get_count()):
+    joy = pygame.joystick.Joystick(i)
+    joy.init()
+    joysticks.append(joy)
+    print(f"Initialized Joystick {i}: {joy.get_name()}")
+
+
+red_button = (255,255,255)
+blue_button = (255,255,255)
+green_button = (255,255,255)
+yellow_button = (255,255,255)
 
 # Game loop
 is_clicked = False
+is_clicked1 = False
+is_clicked2 = False
+is_clicked3 = False
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            x,y = pygame.mouse.get_pos()
-            if x <= (width//2) + ((width//2) - 100)+ 100 and x >=  (width//2) + ((width//2) - 100):
-                if y <= 60 and y >= 10:
+        if event.type == pygame.JOYBUTTONDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+            try:
+                if event.button == 0:
+                    is_clicked= not is_clicked
                     if is_clicked:
-                        logs.append("AI Mode Disabled")
+                        logs.append("Claw Activated")
+                        green_button = (0,255,0)
                     else:
-                        logs.append("AI Mode Enabled")
-                    is_clicked = not is_clicked
+                        logs.append("Claw Deactivated")
+                        green_button = (255,255,255)
+                elif event.button == 1:
+                    is_clicked1 = not is_clicked1
+                    if is_clicked1:
+                        logs.append("AI Mode Activated")
+                        red_button = (255,0,0)
+                    else:
+                        logs.append("AI Mode Deactivated")
+                        red_button = (255,255,255)
+                        
+                elif event.button == 2:
+                    is_clicked2 = not is_clicked2
+                    logs.append("Robot returned to original location")
+                    if is_clicked2:
+                        blue_button = (0,0,255)
+                    else:
+                        blue_button = (255,255,255)
+                
+                elif event.button == 3:
+                    is_clicked3 = not is_clicked3
+                    logs.append("Predefined pose activated")
+                    if is_clicked3:
+                        yellow_button = (255, 250, 0)
+                    else:
+                        yellow_button = (255,255,255)
+
+            except Exception as e:
+                x,y = pygame.mouse.get_pos()
+                if x <= (width//2) + ((width//2) - 100)+ 100 and x >=  (width//2) + ((width//2) - 100) or event.button == 1:
+                    if y <= 60 and y >= 10 or  event.button == 1:
+                        if is_clicked:
+                            pass
+                        else:
+                            pass
+                        is_clicked = not is_clicked
+                
+
         i = 10
         for line in logs:
             text_surface = font.render(f"> {line}", True, WHITE)
@@ -93,6 +147,11 @@ while running:
         screen.blit(text_surface, ((width//2) + ((width//2) - 87), 23))
         pygame.draw.rect(screen, WHITE, static_rect, 1)
 
+
+        pygame.draw.circle(screen, red_button, (width//1.4, height//1.5), 10)
+        pygame.draw.circle(screen, yellow_button, (width//1.5, height//1.5), 10)
+        pygame.draw.circle(screen, green_button, (width//1.4, height//1.4), 10)
+        pygame.draw.circle(screen, blue_button, (width//1.5, height//1.4), 10)
         
     
     pygame.display.flip()

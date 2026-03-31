@@ -91,8 +91,9 @@ while running:
             elif event.axis == 3:
                 vector1[2] = event.value * 3
             
-            print("3D Vector:", vector1)
-            vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
+            # print("3D Vector:", vector1)
+            vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
+            print(vector_pass)
             angles = vector().update(vector_pass)
 
             # print("Servo Angles:", angles)
@@ -100,7 +101,8 @@ while running:
             # kit.servo[12].angle = angles['A2']  # shoulder
             # kit.servo[13].angle = angles['A3']  # elbow
             # kit.servo[14].angle = angles['A4']  # wrist
-            print(angles)
+            # print(angles)
+            pygame.draw.line(w, (255,255,255), (250,250), (250 + vector1[0]*50, 250 - vector1[1]*50), 5)
             
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
