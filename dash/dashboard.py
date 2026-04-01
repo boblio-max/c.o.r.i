@@ -6,7 +6,7 @@ import sys
 from errors import *
 import math
 import os
-
+from vector import vector
 
 pygame.init()
 pygame.joystick.init()
@@ -19,12 +19,12 @@ WHITE = (255, 255, 255)
 BLUE = (0,0,255)
 font = pygame.font.SysFont('Arial', 20)
 static_rect = pygame.Rect(10, height//2, (width//2)-10, (height//2)-10)
-logs = ["Hello", "how are you"]
+logs = []
 
 font       = pygame.font.SysFont('Consolas', 18)
 small_font = pygame.font.SysFont('Consolas', 13)
 
-joint_angles = [90, 180, 90, 90]
+joint_angles = [180, 180, 90, 90]
 
 CIRCLE_R = 65
 col_xs = [width // 6, width // 2.5]
@@ -53,27 +53,32 @@ green_button = (255,255,255)
 yellow_button = (255,255,255)
 
 # Game loop
+is_clicked_ai = False
 is_clicked = False
 is_clicked1 = False
 is_clicked2 = False
 is_clicked3 = False
 running = True
 while running:
+    # -- Event processing (only handle state changes) --
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.JOYBUTTONDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.JOYBUTTONDOWN or event.type == pygame.MOUSEBUTTONDOWN:
             try:
                 if event.button == 0:
                     is_clicked= not is_clicked
                     if is_clicked:
                         logs.append("Claw Activated")
                         green_button = (0,255,0)
+                        joint_angles[0] = 40
                     else:
                         logs.append("Claw Deactivated")
                         green_button = (255,255,255)
+                        joint_angles[0] = 180
                 elif event.button == 1:
                     is_clicked1 = not is_clicked1
+                    is_clicked_ai = is_clicked1
                     if is_clicked1:
                         logs.append("AI Mode Activated")
                         red_button = (255,0,0)
@@ -86,7 +91,6 @@ while running:
                     logs.append("Robot returned to original location")
                     if is_clicked2:
                         blue_button = (0,0,255)
-                    else:
                         blue_button = (255,255,255)
                 
                 elif event.button == 3:
@@ -94,66 +98,70 @@ while running:
                     logs.append("Predefined pose activated")
                     if is_clicked3:
                         yellow_button = (255, 250, 0)
+                        joint_angles = [40, 110, 150, 80]
                     else:
                         yellow_button = (255,255,255)
+            except Exception:
+                pass
 
-            except Exception as e:
-                x,y = pygame.mouse.get_pos()
-                if x <= (width//2) + ((width//2) - 100)+ 100 and x >=  (width//2) + ((width//2) - 100) or event.button == 1:
-                    if y <= 60 and y >= 10 or  event.button == 1:
-                        if is_clicked:
-                            pass
-                        else:
-                            pass
-                        is_clicked = not is_clicked
-                
+    # -- Poll joysticks each frame to build a full 3D vector for IK --
+    if len(joysticks) > 0:
+        j0 = joysticks[0]
+        naxes = j0.get_numaxes()
+        ax0 = j0.get_axis(0) if naxes > 0 else 0.0
+        ax1 = j0.get_axis(1) if naxes > 1 else 0.0
+        # prefer axis 3 for right-stick Y, else axis 2 (triggers) as Z
+        z = 0.0
+        if naxes > 3:
+            z = j0.get_axis(3)
+        elif naxes > 2:
+            z = j0.get_axis(2)
+        vector1 = [ax0 * 3.0, -ax1 * 3.0, z * 3.0]
+        vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
+        try:
+            angles = vector().update(vector_pass)
+            joint_angles = [angles['A1'], angles['A2'], angles['A3'], angles['A4']]
+        except Exception as e:
+            logs.append(str(e))
 
-        i = 10
-        for line in logs:
-            text_surface = font.render(f"> {line}", True, WHITE)
-            screen.blit(text_surface, (15, (height//2)+i))
-            i += 20
-        
-        color = None
-        if is_clicked:
-            color = BLUE
-        else:
-            color = WHITE
-        for i, (cx, cy) in enumerate(circle_positions):
-            angle_rad = math.radians(joint_angles[i])
-            if joint_angles[i] >= 180 or joint_angles[i] <= 0:
-                logs.append(Error(17).get())
-                joint_angles[i] = max(1, min(joint_angles[i], 179))
-                
-            pygame.draw.circle(screen, WHITE, (cx, cy), CIRCLE_R, 2)
-            
-            nx = cx + CIRCLE_R * math.cos(-angle_rad)
-            ny = cy + CIRCLE_R * math.sin(-angle_rad)
-            pygame.draw.line(screen, WHITE, (cx, cy), (int(nx), int(ny)), 2)
+    # -- Drawing (one pass per frame) --
+    screen.fill((0,0,0))
 
-            pygame.draw.circle(screen, WHITE, (cx, cy), 4)
-            
-            lbl = small_font.render(f"{joint_labels[i]}  {joint_angles[i]}°", True, BLUE)
-            screen.blit(lbl, (cx - lbl.get_width() // 2, cy + CIRCLE_R + 6))
-            
-        # err = Error(1)
-        # if err.isThrown():
-        #     logs.append(err.get())
-                            
-        rect = pygame.Rect((width//2) + ((width//2) - 100), 10, 100, 50)
-        pygame.draw.rect(screen, color, rect, 1)
-        
-        text_surface = font.render(f"AI Mode", True, color)
-        screen.blit(text_surface, ((width//2) + ((width//2) - 87), 23))
-        pygame.draw.rect(screen, WHITE, static_rect, 1)
+    i = 10
+    for line in logs[-18:]:
+        text_surface = font.render(f"> {line}", True, WHITE)
+        screen.blit(text_surface, (15, (height//2)+i))
+        i += 20
 
+    color = BLUE if is_clicked_ai else WHITE
+    for i, (cx, cy) in enumerate(circle_positions):
+        angle_rad = math.radians(joint_angles[i])
+        # clamp angles
+        if joint_angles[i] >= 180 or joint_angles[i] <= 0:
+            joint_angles[i] = max(1, min(joint_angles[i], 179))
 
-        pygame.draw.circle(screen, red_button, (width//1.4, height//1.5), 10)
-        pygame.draw.circle(screen, yellow_button, (width//1.5, height//1.5), 10)
-        pygame.draw.circle(screen, green_button, (width//1.4, height//1.4), 10)
-        pygame.draw.circle(screen, blue_button, (width//1.5, height//1.4), 10)
-        
-    
+        pygame.draw.circle(screen, WHITE, (cx, cy), CIRCLE_R, 2)
+
+        nx = cx + CIRCLE_R * math.cos(-angle_rad)
+        ny = cy + CIRCLE_R * math.sin(-angle_rad)
+        pygame.draw.line(screen, WHITE, (cx, cy), (int(nx), int(ny)), 2)
+
+        pygame.draw.circle(screen, WHITE, (cx, cy), 4)
+
+        lbl = small_font.render(f"{joint_labels[i]}  {joint_angles[i]}°", True, BLUE)
+        screen.blit(lbl, (cx - lbl.get_width() // 2, cy + CIRCLE_R + 6))
+
+    rect = pygame.Rect((width//2) + ((width//2) - 100), 10, 100, 50)
+    pygame.draw.rect(screen, color, rect, 1)
+    text_surface = font.render("AI Mode", True, color)
+    screen.blit(text_surface, ((width//2) + ((width//2) - 87), 23))
+    pygame.draw.rect(screen, WHITE, static_rect, 1)
+
+    pygame.draw.circle(screen, yellow_button, (int(width*0.78)+28, int(height*0.78)+0), 15)
+    pygame.draw.circle(screen, blue_button, (int(width*0.78)+0, int(height*0.78)+28), 15)
+    pygame.draw.circle(screen, red_button, (int(width*0.78)-28, int(height*0.78)+0), 15)
+    pygame.draw.circle(screen, green_button, (int(width*0.78)+0, int(height*0.78)-28), 15)
+
     pygame.display.flip()
 
 pygame.quit()

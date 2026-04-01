@@ -20,94 +20,52 @@ plt.show()
 joysticks = []
 for i in range(pygame.joystick.get_count()):
     joy = pygame.joystick.Joystick(i)
-    joy.init()
-    joysticks.append(joy)
-    print(f"Initialized Joystick {i}: {joy.get_name()}")
+        # process events for non-axis actions
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.JOYBUTTONDOWN:
+                if event.button == 0:
+                    if clawActive:
+                        print("Claw deactivated")
+                        clawActive = False
+                    else:
+                        print("Claw activated")
+                        clawActive = True
+                elif event.button == 1:
+                    aiMode = not aiMode
+                    print("AI Mode", "activated" if aiMode else "deactivated")
+                elif event.button == 2:
+                    print("Robot returned to original location")
+                elif event.button == 3:
+                    print("Preset position activated")
 
-w = pygame.display.set_mode([500,500])
-running = True
-clawActive = False
-aiMode = False
-originPl = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+        # Poll joystick axes each frame to construct full vector (left stick X/Y + right Y / triggers for Z)
+        vector1 = [0.0, 0.0, 0.0]
+        if len(joysticks) > 0:
+            j0 = joysticks[0]
+            naxes = j0.get_numaxes()
+            ax0 = j0.get_axis(0) if naxes > 0 else 0.0
+            ax1 = j0.get_axis(1) if naxes > 1 else 0.0
+            # choose axis for Z
+            z = 0.0
+            if naxes > 3:
+                z = j0.get_axis(3)
+            elif naxes > 2:
+                z = j0.get_axis(2)
+            vector1 = [ax0 * 3.0, -ax1 * 3.0, z * 3.0]
 
-        # Handle joystick events
-        elif event.type == pygame.JOYBUTTONDOWN:
-            # You can map specific buttons to in-game actions
-            if event.button == 0:
-                if clawActive:
-                    print("Claw deactivated")
-                    clawActive = False
-                    # kit.servo[10].angle = 0
-                else:
-                    print("Claw activated")
-                    clawActive = True
-                    # kit.servo[10].angle = 180
-            
-            elif event.button == 1:
-                if aiMode:
-                     print("AI Mode deactivated")
-                     aiMode = False
-                else:
-                    print("AI Mode activated")
-                    aiMode = True
-                    
-            elif event.button == 2:
-                # kit.servo[10].angle = 180
-                # kit.servo[11].angle = 0
-                # kit.servo[12].angle = 0
-                # kit.servo[13].angle = 0
-                # kit.servo[14].angle = 0
-                # kit.servo[15].angle = 0
-                print("Robot returned to original location")
-            
-            elif event.button == 3:
-                # kit.servo[10].angle = 40
-                # kit.servo[11].angle = 110
-                # kit.servo[12].angle = 150
-                # kit.servo[13].angle = 80
-                # kit.servo[14].angle = 0
-                # kit.servo[15].angle = 180
-                time.sleep(0.5)
-                # kit.servo[15].angle = 0
-                # kit.servo[10].angle = 180
-                # kit.servo[11].angle = 135
-                # kit.servo[12].angle = 135
-                # kit.servo[13].angle = 135
-                # kit.servo[14].angle = 180
-                print("Preset position activated")
-
-        elif event.type == pygame.JOYAXISMOTION:
-            
-            vector1 = [0, 0, 0]
-
-            if event.axis == 0:
-                vector1[0] = event.value * 3
-            elif event.axis == 1:
-                vector1[1] = -event.value * 3
-            elif event.axis == 3:
-                vector1[2] = event.value * 3
-            
-            # print("3D Vector:", vector1)
             vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
-            print(vector_pass)
-            angles = vector().update(vector_pass)
+            try:
+                angles = vector().update(vector_pass)
+                print("Servo Angles:", angles)
+            except Exception as e:
+                print("IK error:", e)
 
-            # print("Servo Angles:", angles)
-            # kit.servo[11].angle = angles['A1']  # base
-            # kit.servo[12].angle = angles['A2']  # shoulder
-            # kit.servo[13].angle = angles['A3']  # elbow
-            # kit.servo[14].angle = angles['A4']  # wrist
-            # print(angles)
-            pygame.draw.line(w, (255,255,255), (250,250), (250 + vector1[0]*50, 250 - vector1[1]*50), 5)
-            
-        elif event.type == pygame.JOYHATMOTION:
-            print(f"Hat {event.hat} moved to position {event.value}")
-
-        pygame.display.flip()
+        # draw
         w.fill((0,0,0))
+        pygame.draw.line(w, (255,255,255), (250,250), (250 + vector1[0]*50, 250 - vector1[1]*50), 5)
+        pygame.display.flip()
+            # kit.servo[13].angle = angles['A3']  # elbow
 
-    
+            # kit.servo[14].angle = angles['A4']  # wrist

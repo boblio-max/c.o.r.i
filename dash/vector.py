@@ -75,10 +75,10 @@ class vector:
             A2, A3, A4 = 0.0, 0.0, 0.0
 
         B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
-        C = np.array(B) + np.array([L*np.cos(A2+A3)*np.cos(A1),
+        C = B + np.array([L*np.cos(A2+A3)*np.cos(A1),
                             L*np.cos(A2+A3)*np.sin(A1),
                             L*np.sin(A2+A3)])
-        D = np.array(C) + np.array([L*np.cos(A2+A3+A4)*np.cos(A1),
+        D = C + np.array([L*np.cos(A2+A3+A4)*np.cos(A1),
                             L*np.cos(A2+A3+A4)*np.sin(A1),
                             L*np.sin(A2+A3+A4)])
         
@@ -89,10 +89,10 @@ class vector:
         self.quiver3.set_segments([[C, D]])  
 
         angles_deg = {
-            'A1': np.degrees(A1),
-            'A2': np.degrees(A2),
-            'A3': np.degrees(A3),
-            'A4': np.degrees(A4),
+            'A1': np.degrees(A1) % 180,
+            'A2': np.degrees(A2) % 180,
+            'A3': np.degrees(A3) % 180,
+            'A4': np.degrees(A4) % 180,
         }
         
         return angles_deg
