@@ -19,6 +19,10 @@ running = True
 clawActive = False
 aiMode = False
 originPl = True
+DEADZONE = 0.1
+vector1 = [0.0, 0.0, 0.0]
+vec = vector()
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -71,25 +75,33 @@ while running:
                 print("Preset position activated")
 
         elif event.type == pygame.JOYAXISMOTION:
-            
-            vector1 = [0, 0, 0]
 
             if event.axis == 0:
-                vector1[0] = event.value * 3
+                if abs(event.value) > DEADZONE:
+                    vector1[0] = event.value * 3
+                else:
+                    vector1[0] = 0.0
             elif event.axis == 1:
-                vector1[1] = -event.value * 3
+                if abs(event.value) > DEADZONE:
+                    vector1[1] = -event.value * 3
+                else:
+                    vector1[1] = 0.0
             elif event.axis == 3:
-                vector1[2] = event.value * 3
+                if abs(event.value) > DEADZONE:
+                    vector1[2] = -1 * (event.value * 3)
+                else:
+                    vector1[2] = 0.0
             
-            print("3D Vector:", vector1)
+            # print("3D Vector:", vector1)
             vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
-            angles = vector().update(vector_pass)
+            angles = vec.update(vector_pass)
 
             # print("Servo Angles:", angles)
             # kit.servo[11].angle = angles['A1']  # base
             # kit.servo[12].angle = angles['A2']  # shoulder
             # kit.servo[13].angle = angles['A3']  # elbow
             # kit.servo[14].angle = angles['A4']  # wrist
+            print(angles)
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 
