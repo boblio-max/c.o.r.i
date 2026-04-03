@@ -54,40 +54,31 @@ class vector:
         dx = float(ns[0]) 
         dy = float(ns[1])
         dz = float(ns[2])
-        A2, A3, A4 = 0.0, 0.0, 0.0
-        A1 = np.arctan2(dy, dx)
+        A2, A3, A4 = 0,0,0
+        A1 = np.arctan2(dy,dx)
+        B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
 
         r = np.hypot(dx, dy)            
-        s = dz
-
-
-        dist = np.hypot(r, s)
-        max_reach = 3 * L - 1e-6       
-        if dist > max_reach:
-            scale = max_reach / dist
-            r *= scale
-            s *= scale
-
-        if r < 0.01:
-            if abs(s) > 0.01:
-                A2 = np.arctan2(s, 0)
-                A3 = 0.0
-                A4 = 0.0
-        else:
-            c2 = (r*r + s*s - 3*L*L) / (2*L*r)
-            c2 = np.clip(c2, -1.0, 1.0)  
+        s = dz                         
+        
+        try:
+            c2 = (r*r + s*s - 3*L*L) / (2*L*r)      
+            if abs(c2) > 1.0:                    
+                raise ValueError('point out of reach')
             A2 = np.arctan2(s, r) - np.arctan2(np.sqrt(1 - c2*c2), c2)
 
             c23 = (r - L*np.cos(A2)) / (2*L)
             c23 = np.clip(c23, -1.0, 1.0)  
             A3 = np.arccos(c23) - A2              
-            A4 = A3
+            A4 = A3                              
+        except ValueError:
+            A2, A3, A4 = 0.0, 0.0, 0.0
 
         B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
-        C = np.array(B) + np.array([L*np.cos(A2+A3)*np.cos(A1),
+        C = B + np.array([L*np.cos(A2+A3)*np.cos(A1),
                             L*np.cos(A2+A3)*np.sin(A1),
                             L*np.sin(A2+A3)])
-        D = np.array(C) + np.array([L*np.cos(A2+A3+A4)*np.cos(A1),
+        D = C + np.array([L*np.cos(A2+A3+A4)*np.cos(A1),
                             L*np.cos(A2+A3+A4)*np.sin(A1),
                             L*np.sin(A2+A3+A4)])
         
@@ -98,10 +89,10 @@ class vector:
         self.quiver3.set_segments([[C, D]])  
 
         angles_deg = {
-            'A1': np.degrees(A1),
-            'A2': np.degrees(A2),
-            'A3': np.degrees(A3),
-            'A4': np.degrees(A4),
+            'A1': np.degrees(A1) % 180,
+            'A2': np.degrees(A2) % 180,
+            'A3': np.degrees(A3) % 180,
+            'A4': np.degrees(A4) % 180,
         }
         
         return angles_deg
