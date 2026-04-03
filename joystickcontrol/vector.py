@@ -7,6 +7,10 @@ import matplotlib.animation as animation
 fig = plt.figure(figsize=(10, 8))
 ax = fig.add_subplot(111, projection='3d')
 
+# A1 = base rotation
+# A2 = shoulder rotation
+# A3 = elbow rotation
+# A4 = wrist rotation
 
 ax.set_xlim([-5, 5])
 ax.set_ylim([-5, 5])
@@ -55,6 +59,8 @@ class vector:
         dy = float(ns[1])
         dz = float(ns[2])
         A2, A3, A4 = 0.0, 0.0, 0.0
+
+        # Angle of base rotation
         A1 = np.arctan2(dy, dx)
 
         r = np.hypot(dx, dy)            
