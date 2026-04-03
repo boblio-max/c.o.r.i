@@ -51,20 +51,21 @@ red_button = (255,255,255)
 blue_button = (255,255,255)
 green_button = (255,255,255)
 yellow_button = (255,255,255)
+color = (255,255,255)
 
-# Game loop
 is_clicked_ai = False
 is_clicked = False
 is_clicked1 = False
 is_clicked2 = False
 is_clicked3 = False
 running = True
+
 while running:
-    # -- Event processing (only handle state changes) --
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.JOYBUTTONDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+            x,y = pygame.mouse.get_pos()
             try:
                 if event.button == 0:
                     is_clicked= not is_clicked
@@ -76,21 +77,24 @@ while running:
                         logs.append("Claw Deactivated")
                         green_button = (255,255,255)
                         joint_angles[0] = 180
-                elif event.button == 1:
+                elif event.button == 1 or (x <= (width//2) + ((width//2) - 100)+ 100 and x >=  (width//2) + ((width//2) - 100)):
+                    x,y = pygame.mouse.get_pos()
                     is_clicked1 = not is_clicked1
-                    is_clicked_ai = is_clicked1
                     if is_clicked1:
                         logs.append("AI Mode Activated")
                         red_button = (255,0,0)
+                        
                     else:
                         logs.append("AI Mode Deactivated")
                         red_button = (255,255,255)
                         
+
                 elif event.button == 2:
                     is_clicked2 = not is_clicked2
                     logs.append("Robot returned to original location")
                     if is_clicked2:
                         blue_button = (0,0,255)
+                    else:
                         blue_button = (255,255,255)
                 
                 elif event.button == 3:
@@ -104,13 +108,13 @@ while running:
             except Exception:
                 pass
 
-    # -- Poll joysticks each frame to build a full 3D vector for IK --
+    
     if len(joysticks) > 0:
         j0 = joysticks[0]
         naxes = j0.get_numaxes()
         ax0 = j0.get_axis(0) if naxes > 0 else 0.0
         ax1 = j0.get_axis(1) if naxes > 1 else 0.0
-        # prefer axis 3 for right-stick Y, else axis 2 (triggers) as Z
+        
         z = 0.0
         if naxes > 3:
             z = j0.get_axis(3)
@@ -124,7 +128,7 @@ while running:
         except Exception as e:
             logs.append(str(e))
 
-    # -- Drawing (one pass per frame) --
+
     screen.fill((0,0,0))
 
     i = 10
@@ -133,7 +137,7 @@ while running:
         screen.blit(text_surface, (15, (height//2)+i))
         i += 20
 
-    color = BLUE if is_clicked_ai else WHITE
+
     for i, (cx, cy) in enumerate(circle_positions):
         angle_rad = math.radians(joint_angles[i])
         # clamp angles
@@ -152,15 +156,16 @@ while running:
         screen.blit(lbl, (cx - lbl.get_width() // 2, cy + CIRCLE_R + 6))
 
     rect = pygame.Rect((width//2) + ((width//2) - 100), 10, 100, 50)
-    pygame.draw.rect(screen, color, rect, 1)
-    text_surface = font.render("AI Mode", True, color)
+    pygame.draw.rect(screen, red_button, rect, 1)
+    text_surface = font.render("AI Mode", True, WHITE)
+
     screen.blit(text_surface, ((width//2) + ((width//2) - 87), 23))
     pygame.draw.rect(screen, WHITE, static_rect, 1)
 
-    pygame.draw.circle(screen, yellow_button, (int(width*0.78)+28, int(height*0.78)+0), 15)
-    pygame.draw.circle(screen, blue_button, (int(width*0.78)+0, int(height*0.78)+28), 15)
-    pygame.draw.circle(screen, red_button, (int(width*0.78)-28, int(height*0.78)+0), 15)
-    pygame.draw.circle(screen, green_button, (int(width*0.78)+0, int(height*0.78)-28), 15)
+    pygame.draw.circle(screen, red_button, (int(width*0.78)+28, int(height*0.78)+0), 15)
+    pygame.draw.circle(screen, green_button, (int(width*0.78)+0, int(height*0.78)+28), 15)
+    pygame.draw.circle(screen, blue_button, (int(width*0.78)-28, int(height*0.78)+0), 15)
+    pygame.draw.circle(screen, yellow_button, (int(width*0.78)+0, int(height*0.78)-28), 15)
 
     pygame.display.flip()
 
