@@ -95,6 +95,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     scaled_x = (disx / max_disx) * 3
                     scaled_y = (disy / max_disy) * 3
                     scaled_z = (disz / max_disz) * 3
+                    
                     # print(f"3d vector: ({scaled_x}, {scaled_y}, {scaled_z})")
                     vector_pass = f"{scaled_x} {scaled_y} {scaled_z}"
                     angles = vec.update(vector_pass)
