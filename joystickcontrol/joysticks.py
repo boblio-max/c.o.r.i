@@ -105,7 +105,7 @@ while running:
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 
-        pygame.display.flip()
-        w.fill((0,0,0))
+    pygame.display.flip()
+    w.fill((0,0,0))
 
     
