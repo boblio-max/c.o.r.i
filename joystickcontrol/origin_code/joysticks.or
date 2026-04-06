@@ -1,0 +1,150 @@
+import pygame
+import time
+py {
+    import matplotlib.pyplot as plt
+}
+from vector import vector
+
+py {
+    pygame.init()
+    pygame.joystick.init()
+
+    joysticks = []
+    for i in range(pygame.joystick.get_count()):
+        joy = pygame.joystick.Joystick(i)
+        joy.init()
+        joysticks.append(joy)
+        print(f"Initialized Joystick {i}: {joy.get_name()}")
+
+    w = pygame.display.set_mode([500,500])
+}
+
+let running: bool = true
+let clawActive: bool = false
+let aiMode: bool = false
+let originPl: bool = true
+
+const DEADZONE: float = 0.1
+let vector1: list = [0.0, 0.0, 0.0]
+let vec: vector = vector()
+
+while running {
+    let num_events: int = 0
+    py {
+        events = pygame.event.get()
+        num_events = len(events)
+    }
+
+    for i in range(0, num_events) {
+        let event_type: int = 0
+        let event_button: int = -1
+        let event_axis: int = -1
+        let event_value: float = 0.0
+
+        py {
+            e = events[i]
+            event_type = e.type
+            if e.type == pygame.JOYBUTTONDOWN:
+                event_button = e.button
+            elif e.type == pygame.JOYAXISMOTION:
+                event_axis = e.axis
+                event_value = e.value
+        }
+
+        py {
+            QUIT_TYPE = pygame.QUIT
+            BUTTON_TYPE = pygame.JOYBUTTONDOWN
+            AXIS_TYPE = pygame.JOYAXISMOTION
+            HAT_TYPE = pygame.JOYHATMOTION
+        }
+
+        let is_quit: bool = false
+        let is_button: bool = false
+        let is_axis: bool = false
+        let is_hat: bool = false
+
+        py {
+            is_quit = (event_type == QUIT_TYPE)
+            is_button = (event_type == BUTTON_TYPE)
+            is_axis = (event_type == AXIS_TYPE)
+            is_hat = (event_type == HAT_TYPE)
+        }
+
+        if is_quit {
+            running = false
+        } 
+        elif is_button {
+            if event_button == 0 {
+                if clawActive {
+                    print "Claw deactivated"
+                    clawActive = false
+                } else {
+                    print "Claw activated"
+                    clawActive = true
+                }
+            } 
+            elif event_button == 1 {
+                if aiMode {
+                    print "AI Mode deactivated"
+                    aiMode = false
+                } else {
+                    print "AI Mode activated"
+                    aiMode = true
+                }
+            } 
+            elif event_button == 2 {
+                print "Robot returned to original location"
+            } 
+            elif event_button == 3 {
+                py { time.sleep(0.5) }
+                print "Preset position activated"
+            }
+        } 
+        elif is_axis {
+            if event_axis == 0 {
+                if event_value > DEADZONE || event_value < 0 - DEADZONE {
+                    vector1[0] = event_value * 3
+                } 
+                else {
+                    vector1[0] = 0.0
+                }
+            } 
+            elif event_axis == 1 {
+                if event_value > DEADZONE || event_value < 0 - DEADZONE {
+                    vector1[1] = (0 - event_value) * 3
+                } 
+                else {
+                    vector1[1] = 0.0
+                }
+            } 
+            elif event_axis == 3 {
+                if event_value > DEADZONE || event_value < 0 - DEADZONE {
+                    vector1[2] = (0 - event_value) * 3
+                } 
+                else {
+                    vector1[2] = 0.0
+                }
+            }
+
+            let v0 = vector1[0]
+            let v1 = vector1[1]
+            let v2 = vector1[2]
+            let vector_pass: str = ""
+            py {
+                vector_pass = f"{v0} {v1} {v2}"
+            }
+            let angles: dict = vec.update(vector_pass)
+            print vector_pass
+            print angles
+
+        } 
+        elif is_hat {
+            print "Hat moved"
+        }
+    }
+
+    py {
+        pygame.display.flip()
+        w.fill((0,0,0))
+    }
+}

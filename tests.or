@@ -1,25 +1,29 @@
 import pygame
 import time
-from adafruit_servokit import ServoKit
+#from adafruit_servokit import ServoKit
 
-py {
-    kit = ServoKit(channels=16)
-    pygame.init()
-    pygame.joystick.init()
-    joystick = pygame.joystick.Joystick(0)
-    joystick.init()
-}
+#py {
+#    kit = ServoKit(channels=16)
+#    pygame.init()
+#    pygame.joystick.init()
+#    joystick = pygame.joystick.Joystick(0)
+#    joystick.init()
+#}
 
 print "Joystick connected"
 
-let angle: float = 90.0
+let angle1: float = 90.0
+let angle2: float = 90.0
 while true {
     py {
         pygame.event.pump()
-        y = joystick.get_axis(1)
-        angle = (y + 1) / 2 * 180
+        x = joystick.get_axis(0)
+        angle1 = (x + 1) / 2 * 180
+        y = joystick.get_axis(2)
+        angle2 = (y + 1) / 2 * 180
 
     }
-    print angle
-    set servo.angle 15, angle
+    print angle1
+    set servo.angle 15, angle1
+    set servo.angle 14, angle2
 }
