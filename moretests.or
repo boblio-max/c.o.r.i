@@ -5,18 +5,4 @@ py {
     kit = ServoKit(channels=16)
 }
 
-py {
-    time.sleep(2)
-}
-set servo.angle 15, 180
-py {
-    time.sleep(1)
-}
-set servo.angle 15, 00
-py {
-    time.sleep(1)
-}
-set servo.angle 15, 90
-py {
-    time.sleep(1)
-}
+set servo.angle 15, 0
