@@ -15,7 +15,7 @@ preprocess = transforms.Compose([
                          std=[0.229, 0.224, 0.225]),
 ])
 
-cap = cv2.VideoCapture(0)  # 0 = default webcam
+cap = cv2.VideoCapture(0)  
 
 with torch.no_grad():
     while True:
@@ -23,9 +23,8 @@ with torch.no_grad():
         if not ret:
             break
 
-        # BGR (OpenCV) → RGB → tensor → batch dim
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        tensor = preprocess(rgb).unsqueeze(0).to(device)  # [1, 3, 224, 224]
+        tensor = preprocess(rgb).unsqueeze(0).to(device)  
 
         output = model(tensor)  # raw logits
         probs = torch.softmax(output, dim=1)

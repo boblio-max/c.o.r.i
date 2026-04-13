@@ -1,5 +1,6 @@
 import pygame
 import time
+
 py {
     import matplotlib.pyplot as plt
 }
@@ -100,6 +101,7 @@ while running {
                 print "Preset position activated"
             }
         } 
+
         elif is_axis {
             if event_axis == 0 {
                 if event_value > DEADZONE || event_value < 0 - DEADZONE {

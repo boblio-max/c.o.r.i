@@ -108,7 +108,7 @@ while running:
             except Exception:
                 pass
 
-    
+    angles = None
     if len(joysticks) > 0:
         j0 = joysticks[0]
         naxes = j0.get_numaxes()
@@ -124,11 +124,10 @@ while running:
         vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
         try:
             angles = vector().update(vector_pass)
-            joint_angles = [angles['A1'], angles['A2'], angles['A3'], angles['A4']]
         except Exception as e:
             logs.append(str(e))
 
-
+    joint_angles = [angles["A1"], angles["A2"], angles["A3"], angles["A4"]]
     screen.fill((0,0,0))
 
     i = 10
@@ -137,23 +136,44 @@ while running:
         screen.blit(text_surface, (15, (height//2)+i))
         i += 20
 
+    pygame.draw.circle(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), CIRCLE_R, 2)
+    angle_rad = math.radians(joint_angles[0])
+    nx = circle_positions[0][0] + CIRCLE_R * math.cos(-angle_rad)
+    ny = circle_positions[0][1] + CIRCLE_R * math.sin(-angle_rad)
+    pygame.draw.line(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), (int(nx), int(ny)), 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), 4)
+    lbl = small_font.render(f"{joint_labels[0]}  {joint_angles[0]}°", True, BLUE)
+    screen.blit(lbl, (circle_positions[0][0] - lbl.get_width() // 2, circle_positions[0][1] + CIRCLE_R + 6))
 
-    for i, (cx, cy) in enumerate(circle_positions):
-        angle_rad = math.radians(joint_angles[i])
-        # clamp angles
-        if joint_angles[i] >= 180 or joint_angles[i] <= 0:
-            joint_angles[i] = max(1, min(joint_angles[i], 179))
+    pygame.draw.circle(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), CIRCLE_R, 2)
+    angle_rad1 = math.radians(joint_angles[1])
+    nx1 = circle_positions[1][0] + CIRCLE_R * math.cos(-angle_rad1)
+    ny1 = circle_positions[1][1] + CIRCLE_R * math.sin(-angle_rad1)
+    pygame.draw.line(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), (int(nx1), int(ny1)), 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), 4)
+    lbl = small_font.render(f"{joint_labels[1]}  {joint_angles[1]}°", True, BLUE)
+    screen.blit(lbl, (circle_positions[1][0] - lbl.get_width() // 2, circle_positions[1][1] + CIRCLE_R + 6))
 
-        pygame.draw.circle(screen, WHITE, (cx, cy), CIRCLE_R, 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), CIRCLE_R, 2)
+    angle_rad2 = math.radians(joint_angles[2])
+    nx2 = circle_positions[2][0] + CIRCLE_R * math.cos(-angle_rad2)
+    ny2 = circle_positions[2][1] + CIRCLE_R * math.sin(-angle_rad2)
+    pygame.draw.line(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), (int(nx2), int(ny2)), 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), 4)
+    lbl = small_font.render(f"{joint_labels[2]}  {joint_angles[2]}°", True, BLUE)
+    screen.blit(lbl, (circle_positions[2][0] - lbl.get_width() // 2, circle_positions[2][1] + CIRCLE_R + 6))
 
-        nx = cx + CIRCLE_R * math.cos(-angle_rad)
-        ny = cy + CIRCLE_R * math.sin(-angle_rad)
-        pygame.draw.line(screen, WHITE, (cx, cy), (int(nx), int(ny)), 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), CIRCLE_R, 2)
+    angle_rad3 = math.radians(joint_angles[3])
+    nx3 = circle_positions[3][0] + CIRCLE_R * math.cos(-angle_rad3)
+    ny3 = circle_positions[3][1] + CIRCLE_R * math.sin(-angle_rad3)
+    pygame.draw.line(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), (int(nx3), int(ny3)), 2)
+    pygame.draw.circle(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), 4)
+    lbl = small_font.render(f"{joint_labels[3]}  {joint_angles[3]}°", True, BLUE)
+    screen.blit(lbl, (circle_positions[3][0] - lbl.get_width() // 2, circle_positions[3][1] + CIRCLE_R + 6))
 
-        pygame.draw.circle(screen, WHITE, (cx, cy), 4)
-
-        lbl = small_font.render(f"{joint_labels[i]}  {joint_angles[i]}°", True, BLUE)
-        screen.blit(lbl, (cx - lbl.get_width() // 2, cy + CIRCLE_R + 6))
+    
+    
 
     rect = pygame.Rect((width//2) + ((width//2) - 100), 10, 100, 50)
     pygame.draw.rect(screen, red_button, rect, 1)

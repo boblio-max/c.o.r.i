@@ -101,7 +101,11 @@ while running:
             # kit.servo[12].angle = angles['A2']  # shoulder
             # kit.servo[13].angle = angles['A3']  # elbow
             # kit.servo[14].angle = angles['A4']  # wrist
-            print(angles)
+            print(angles["A1"])
+            print(angles["A2"])
+            print(angles["A3"])
+            print(angles["A4"])
+
         elif event.type == pygame.JOYHATMOTION:
             print(f"Hat {event.hat} moved to position {event.value}")
 

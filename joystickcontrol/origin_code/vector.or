@@ -40,7 +40,6 @@ class vector() {
     def update(vector_str) {
         let angles_deg: dict = {}
         py {
-            import numpy as np
             n = vector_str
             ns = n.split(" ")
             dx = float(ns[0]) 
