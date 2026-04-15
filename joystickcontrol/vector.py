@@ -1,60 +1,48 @@
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
+import matplotlib.animation as animation
 
-# Try to import matplotlib for optional visualization. If it's not available,
-# provide lightweight dummy quiver objects so this module can be imported
-# and the `vector` math can be used without requiring plotting dependencies.
-try:
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
-    import matplotlib.animation as animation
 
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    ax.set_xlim([-5, 5])
-    ax.set_ylim([-5, 5])
-    ax.set_zlim([-5, 5])
-    ax.set_xlabel('X')
-    ax.set_ylabel('Y')
-    ax.set_zlabel('Z')
-    ax.set_title('3D vectors')
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
 
-    L = 1
-    Lm = 1.57079
-    A1 = 0
-    A2 = 0
-    A3 = 0
-    A4 = 0
+# A1 = base rotation
+# A2 = shoulder rotation
+# A3 = elbow rotation
+# A4 = wrist rotation
 
-    n = "1 1 1"
-    ns = n.split(" ")
+ax.set_xlim([-5, 5])
+ax.set_ylim([-5, 5])
+ax.set_zlim([-5, 5])
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.set_title('3D vectors')
+L = 1
+Lm = 1.57079
+A1 = 0
+A2 = 0
+A3 = 0
+A4 = 0
 
-    A = (0, 0, 0)
-    B = (L * np.cos(A2) * np.cos(A1), L * np.cos(A2) * np.sin(A1), L * np.sin(A2))
-    C = np.add(B, (L * np.cos(A2 + A3) * np.cos(A1), L * np.cos(A2 + A3) * np.sin(A1), L * np.sin(A2 + A3)))
-    D = np.add(
-        C,
-        (L * np.cos(A2 + A3 + A4) * np.cos(A1), L * np.cos(A2 + A3 + A4) * np.sin(A1), L * np.sin(A2 + A3 + A4)),
-    )
+n = "1 1 1"
 
-    N = (ns[0], ns[1], ns[2])
-    quiver_object = ax.quiver(A[0], A[1], A[2], N[0], N[1], N[2], color='r', label='End Vector')
-    quiver1 = ax.quiver(A[0], A[1], A[2], B[0], B[1], B[2], color='b', label='Shoulder Vector')
-    quiver2 = ax.quiver(B[0], B[1], B[2], C[0], C[1], C[2], color='y', label='Elbow Vector')
-    quiver3 = ax.quiver(C[0], C[1], C[2], D[0], D[1], D[2], color='r', label='Wrist Vector')
+ns = n.split(" ")
 
-    ax.legend()
-    _MATPLOTLIB_AVAILABLE = True
-except Exception:
-    _MATPLOTLIB_AVAILABLE = False
 
-    class _DummyQuiver:
-        def set_segments(self, *_, **__):
-            return None
+A = (0,0,0)
+B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
+C = np.add(B, (L*np.cos(A2 + A3)*np.cos(A1), L*np.cos(A2 + A3)*np.sin(A3), L*np.sin(A2 + A3)))
+D = np.add(C, (L*np.cos(A2 + A3 + A4)*np.cos(A1), L*np.cos(A2 + A3 + A4)*np.sin(A1), L* np.sin(A2 + A3 + A4)))
 
-    quiver_object = _DummyQuiver()
-    quiver1 = _DummyQuiver()
-    quiver2 = _DummyQuiver()
-    quiver3 = _DummyQuiver()
+N = (ns[0], ns[1], ns[2])
+quiver_object = ax.quiver(A[0], A[1], A[2], N[0], N[1], N[2], color='r', label='End Vector')
+quiver1 = ax.quiver(A[0], A[1], A[2], B[0], B[1], B[2], color='b', label='Shoulder Vector')
+quiver2 = ax.quiver(B[0], B[1], B[2], C[0], C[1], C[2], color='y', label='Elbow Vector')
+quiver3 = ax.quiver(C[0], C[1], C[2], D[0], D[1], D[2], color='r', label='Wrist Vector')
+
+ax.legend()
 
 class vector:
     def __init__(self):

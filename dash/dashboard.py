@@ -17,6 +17,10 @@ pygame.display.set_caption("C.O.R.I DASHBOARD")
 
 WHITE = (255, 255, 255)
 BLUE = (0,0,255)
+BACKGROUND = (30, 30, 30)
+CIRCLE_COLOR = (200, 200, 200)
+NEEDLE_COLOR = (0, 200, 200)
+LABEL_COLOR = (180, 180, 255)
 font = pygame.font.SysFont('Arial', 20)
 static_rect = pygame.Rect(10, height//2, (width//2)-10, (height//2)-10)
 logs = []
@@ -72,6 +76,7 @@ while running:
                     if is_clicked:
                         logs.append("Claw Activated")
                         green_button = (0,255,0)
+                        
                         joint_angles[0] = 40
                     else:
                         logs.append("Claw Deactivated")
@@ -127,8 +132,32 @@ while running:
         except Exception as e:
             logs.append(str(e))
 
-    joint_angles = [angles["A1"], angles["A2"], angles["A3"], angles["A4"]]
-    screen.fill((0,0,0))
+    # Safely update displayed joint angles only when we have valid angle data.
+    if angles:
+        try:
+            a1 = float(angles.get("A1", joint_angles[0]))
+            a2 = float(angles.get("A2", joint_angles[1]))
+            a3 = float(angles.get("A3", joint_angles[2]))
+            a4 = float(angles.get("A4", joint_angles[3]))
+        except Exception:
+            a1, a2, a3, a4 = joint_angles
+
+        # Normalize/format angles for display:
+        def norm360(x):
+            return (x % 360 + 360) % 360
+
+        def clamp0_180(x):
+            return max(0, min(180, x))
+
+        a1 = norm360(a1)
+        a2 = clamp0_180(a2)
+        a3 = clamp0_180(a3)
+        a4 = clamp0_180(a4)
+
+        joint_angles = [int(round(a1)), int(round(a2)), int(round(a3)), int(round(a4))]
+
+    # Improved background color for better contrast
+    screen.fill((30, 30, 30))
 
     i = 10
     for line in logs[-18:]:
@@ -136,40 +165,40 @@ while running:
         screen.blit(text_surface, (15, (height//2)+i))
         i += 20
 
-    pygame.draw.circle(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), CIRCLE_R, 2)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[0][0], circle_positions[0][1]), CIRCLE_R, 2)
     angle_rad = math.radians(joint_angles[0])
     nx = circle_positions[0][0] + CIRCLE_R * math.cos(-angle_rad)
     ny = circle_positions[0][1] + CIRCLE_R * math.sin(-angle_rad)
-    pygame.draw.line(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), (int(nx), int(ny)), 2)
-    pygame.draw.circle(screen, WHITE, (circle_positions[0][0], circle_positions[0][1]), 4)
-    lbl = small_font.render(f"{joint_labels[0]}  {joint_angles[0]}°", True, BLUE)
+    pygame.draw.line(screen, NEEDLE_COLOR, (circle_positions[0][0], circle_positions[0][1]), (int(nx), int(ny)), 3)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[0][0], circle_positions[0][1]), 4)
+    lbl = small_font.render(f"{joint_labels[0]}  {joint_angles[0]}°", True, LABEL_COLOR)
     screen.blit(lbl, (circle_positions[0][0] - lbl.get_width() // 2, circle_positions[0][1] + CIRCLE_R + 6))
 
-    pygame.draw.circle(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), CIRCLE_R, 2)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[1][0], circle_positions[1][1]), CIRCLE_R, 2)
     angle_rad1 = math.radians(joint_angles[1])
     nx1 = circle_positions[1][0] + CIRCLE_R * math.cos(-angle_rad1)
     ny1 = circle_positions[1][1] + CIRCLE_R * math.sin(-angle_rad1)
-    pygame.draw.line(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), (int(nx1), int(ny1)), 2)
-    pygame.draw.circle(screen, WHITE, (circle_positions[1][0], circle_positions[1][1]), 4)
-    lbl = small_font.render(f"{joint_labels[1]}  {joint_angles[1]}°", True, BLUE)
+    pygame.draw.line(screen, NEEDLE_COLOR, (circle_positions[1][0], circle_positions[1][1]), (int(nx1), int(ny1)), 3)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[1][0], circle_positions[1][1]), 4)
+    lbl = small_font.render(f"{joint_labels[1]}  {joint_angles[1]}°", True, LABEL_COLOR)
     screen.blit(lbl, (circle_positions[1][0] - lbl.get_width() // 2, circle_positions[1][1] + CIRCLE_R + 6))
 
-    pygame.draw.circle(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), CIRCLE_R, 2)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[2][0], circle_positions[2][1]), CIRCLE_R, 2)
     angle_rad2 = math.radians(joint_angles[2])
     nx2 = circle_positions[2][0] + CIRCLE_R * math.cos(-angle_rad2)
     ny2 = circle_positions[2][1] + CIRCLE_R * math.sin(-angle_rad2)
-    pygame.draw.line(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), (int(nx2), int(ny2)), 2)
-    pygame.draw.circle(screen, WHITE, (circle_positions[2][0], circle_positions[2][1]), 4)
-    lbl = small_font.render(f"{joint_labels[2]}  {joint_angles[2]}°", True, BLUE)
+    pygame.draw.line(screen, NEEDLE_COLOR, (circle_positions[2][0], circle_positions[2][1]), (int(nx2), int(ny2)), 3)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[2][0], circle_positions[2][1]), 4)
+    lbl = small_font.render(f"{joint_labels[2]}  {joint_angles[2]}°", True, LABEL_COLOR)
     screen.blit(lbl, (circle_positions[2][0] - lbl.get_width() // 2, circle_positions[2][1] + CIRCLE_R + 6))
 
-    pygame.draw.circle(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), CIRCLE_R, 2)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[3][0], circle_positions[3][1]), CIRCLE_R, 2)
     angle_rad3 = math.radians(joint_angles[3])
     nx3 = circle_positions[3][0] + CIRCLE_R * math.cos(-angle_rad3)
     ny3 = circle_positions[3][1] + CIRCLE_R * math.sin(-angle_rad3)
-    pygame.draw.line(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), (int(nx3), int(ny3)), 2)
-    pygame.draw.circle(screen, WHITE, (circle_positions[3][0], circle_positions[3][1]), 4)
-    lbl = small_font.render(f"{joint_labels[3]}  {joint_angles[3]}°", True, BLUE)
+    pygame.draw.line(screen, NEEDLE_COLOR, (circle_positions[3][0], circle_positions[3][1]), (int(nx3), int(ny3)), 3)
+    pygame.draw.circle(screen, CIRCLE_COLOR, (circle_positions[3][0], circle_positions[3][1]), 4)
+    lbl = small_font.render(f"{joint_labels[3]}  {joint_angles[3]}°", True, LABEL_COLOR)
     screen.blit(lbl, (circle_positions[3][0] - lbl.get_width() // 2, circle_positions[3][1] + CIRCLE_R + 6))
 
     
