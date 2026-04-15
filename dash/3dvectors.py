@@ -128,9 +128,9 @@ while running:
         {'color': (0, 255, 0), 'vec': np.array([0, 100, 0])},   # Y (Green)
         {'color': (0, 0, 255), 'vec': np.array([0, 0, 100])},   # Z (Blue)
         # Joystick/interactive vector — ensure numeric dtype (use current joystick values)
-        {'color': (0, 255, 255), 'vec': np.array([point_ab[0], point_ab[1], point_ab[2]], dtype=float)},
-        {'color': (255, 255, 0), 'vec': np.array([point_bc[0], point_bc[1], point_bc[2]], dtype=float)},
-        {'color': (255, 0, 255), 'vec': np.array([point_cd[0], point_cd[1], point_cd[2]], dtype=float)}
+        {'color': (0, 255, 255), 'vec': np.array([point_ab[0] * 10, point_ab[1] * 10, point_ab[2] * 10], dtype=float)},
+        {'color': (255, 255, 0), 'vec': np.array([point_bc[0] * 10, point_bc[1] * 10, point_bc[2] * 10], dtype=float)},
+        {'color': (255, 0, 255), 'vec': np.array([point_cd[0] * 10, point_cd[1] * 10, point_cd[2] * 10], dtype=float)}
     ]
 
     # 4. Drawing
