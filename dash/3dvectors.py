@@ -53,7 +53,7 @@ while running:
     dt = clock.tick(60) / 1000.0
 
     a, b, c, d = vec.update(n)
-    print(b)
+    print(f"Updated Vectors: A={a}, B={b}, C={c}, D={d}")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -97,7 +97,7 @@ while running:
         {'color': (0, 255, 0), 'vec': np.array([0, -100, 0])},  # Y (Green)
         {'color': (0, 0, 255), 'vec': np.array([0, 0, -100])},   # Z (Blue)
         {'color': (255, 255, 255), 'vec': np.array([float(ns[0]), float(ns[1]), float(ns[2])], dtype=float)},
-        {'color': (0, 0, 255), 'vec': np.array([b[0] * 50, b[1] * 50, b[2] * 50])},
+        {'color': (0, 0, 255), 'vec': np.array([a[0] * 50, a[1] * 50, a[2] * 50])},
         {"color": (255, 0, 0), 'vec': np.array(ab) * 50},
         {"color": (0, 255, 0), 'vec': np.array(bc) * 50},
         {"color": (0, 0, 255), 'vec': np.array(cd) * 50},
