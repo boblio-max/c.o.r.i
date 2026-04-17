@@ -117,9 +117,17 @@ while running:
     if len(joysticks) > 0:
         j0 = joysticks[0]
         naxes = j0.get_numaxes()
-        ax0 = j0.get_axis(0) if naxes > 0 else 0.0
-        ax1 = j0.get_axis(1) if naxes > 1 else 0.0
-        
+        if naxes > 0:
+            
+            ax0 = j0.get_axis(0) 
+        else:
+            ax0 = 0.0
+
+        if naxes > 1:
+            ax1 = j0.get_axis(1) 
+        else:
+            ax1 = 0.0
+
         z = 0.0
         if naxes > 3:
             z = j0.get_axis(3)

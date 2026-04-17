@@ -103,11 +103,4 @@ class vector:
         self.quiver2.set_segments([[B, C]])
         self.quiver3.set_segments([[C, D]])  
 
-        angles_deg = {
-            'A1': np.degrees(A1),
-            'A2': np.degrees(A2),
-            'A3': np.degrees(A3),
-            'A4': np.degrees(A4),
-        }
-        
-        return angles_deg
+        return A, B, C, D
