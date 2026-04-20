@@ -2,7 +2,36 @@ import pygame
 import sys
 import math
 import os
+import numpy as np
 from vector import vector
+# class vector:
+#     def update(self, vector_str):
+#         try:
+#             ns = vector_str.split(' ')
+#             dx, dy, dz = float(ns[0]), float(ns[1]), float(ns[2])
+#             L = 1.0
+#             A1 = np.degrees(np.arctan2(dy, dx))
+#             r = np.hypot(dx, dy)
+#             s = dz
+#             dist = np.hypot(r, s)
+#             max_reach = 3 * L - 1e-6
+#             if dist > max_reach:
+#                 scale = max_reach / dist
+#                 r *= scale
+#                 s *= scale
+            
+#             # IK calculation logic
+#             c2 = (r*r + s*s - 3*L*L) / (2*L*r) if r > 0.01 else 0
+#             c2 = np.clip(c2, -1.0, 1.0)
+#             A2 = np.degrees(np.arctan2(s, r) - np.arctan2(np.sqrt(1 - c2*c2), c2))
+#             c23 = (r - L*np.cos(np.radians(A2))) / (2*L)
+#             c23 = np.clip(c23, -1.0, 1.0)
+#             A3 = np.degrees(np.arccos(c23)) - A2
+#             A4 = A3 # Wrist mirrors elbow in this simplified model
+            
+#             return {'A1': A1, 'A2': A2, 'A3': A3, 'A4': A4}
+#         except:
+#             return {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0}
 
 pygame.init()
 pygame.joystick.init()

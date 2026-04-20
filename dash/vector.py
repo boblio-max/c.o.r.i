@@ -52,55 +52,30 @@ class vector:
         self.quiver2 = quiver2
         self.quiver3 = quiver3
 
-    def update(self, vector): 
-        n = vector
-        ns = n.split(" ")
-        dx = float(ns[0]) 
-        dy = float(ns[1])
-        dz = float(ns[2])
-        A2, A3, A4 = 0.0, 0.0, 0.0
-
-        # Angle of base rotation
-        A1 = np.arctan2(dy, dx)
-
-        r = np.hypot(dx, dy)            
-        s = dz
-
-
-        dist = np.hypot(r, s)
-        max_reach = 3 * L - 1e-6       
-        if dist > max_reach:
-            scale = max_reach / dist
-            r *= scale
-            s *= scale
-
-        if r < 0.01:
-            if abs(s) > 0.01:
-                A2 = np.arctan2(s, 0)
-                A3 = 0.0
-                A4 = 0.0
-        else:
-            c2 = (r*r + s*s - 3*L*L) / (2*L*r)
-            c2 = np.clip(c2, -1.0, 1.0)  
-            A2 = np.arctan2(s, r) - np.arctan2(np.sqrt(1 - c2*c2), c2)
-
-            c23 = (r - L*np.cos(A2)) / (2*L)
-            c23 = np.clip(c23, -1.0, 1.0)  
-            A3 = np.arccos(c23) - A2              
-            A4 = A3
-
-        B = (L*np.cos(A2)*np.cos(A1), L*np.cos(A2)*np.sin(A1), L*np.sin(A2))
-        C = np.array(B) + np.array([L*np.cos(A2+A3)*np.cos(A1),
-                            L*np.cos(A2+A3)*np.sin(A1),
-                            L*np.sin(A2+A3)])
-        D = np.array(C) + np.array([L*np.cos(A2+A3+A4)*np.cos(A1),
-                            L*np.cos(A2+A3+A4)*np.sin(A1),
-                            L*np.sin(A2+A3+A4)])
-        
-        
-        self.quiver_object.set_segments([[[0, 0, 0], [dx, dy, dz]]])
-        self.quiver1.set_segments([[[0,0,0], B]])
-        self.quiver2.set_segments([[B, C]])
-        self.quiver3.set_segments([[C, D]])  
-
-        return A, B, C, D
+    def update(self, vector_str):
+        try:
+            ns = vector_str.split(' ')
+            dx, dy, dz = float(ns[0]), float(ns[1]), float(ns[2])
+            L = 1.0
+            A1 = np.degrees(np.arctan2(dy, dx))
+            r = np.hypot(dx, dy)
+            s = dz
+            dist = np.hypot(r, s)
+            max_reach = 3 * L - 1e-6
+            if dist > max_reach:
+                scale = max_reach / dist
+                r *= scale
+                s *= scale
+            
+            # IK calculation logic
+            c2 = (r*r + s*s - 3*L*L) / (2*L*r) if r > 0.01 else 0
+            c2 = np.clip(c2, -1.0, 1.0)
+            A2 = np.degrees(np.arctan2(s, r) - np.arctan2(np.sqrt(1 - c2*c2), c2))
+            c23 = (r - L*np.cos(np.radians(A2))) / (2*L)
+            c23 = np.clip(c23, -1.0, 1.0)
+            A3 = np.degrees(np.arccos(c23)) - A2
+            A4 = A3 # Wrist mirrors elbow in this simplified model
+            
+            return {'A1': A1, 'A2': A2, 'A3': A3, 'A4': A4}
+        except:
+            return {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0}
