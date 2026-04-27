@@ -3,7 +3,8 @@ import sys
 import math
 import os
 import numpy as np
-from vector import vector
+from ik_solver import IKSolver
+
 # class vector:
 #     def update(self, vector_str):
 #         try:
@@ -138,7 +139,7 @@ while running:
         vector1 = [ax0 * 3.0, -ax1 * 3.0, z * 3.0]
         vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
         try:
-            angles = vector().update(vector_pass)
+            angles = IKSolver().solve_from_string(vector_pass)
         except Exception as e:
             logs.append(str(e))
 
