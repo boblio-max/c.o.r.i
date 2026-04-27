@@ -54,17 +54,23 @@ class IKSolver:
         
         return angles_deg
         
+    def update(self, vector):
+        """
+        Helper method to solve from a space-separated string "dx dy dz".
+        """
+        parts = vector.split(" ")
+        dx = float(parts[0]) 
+        dy = float(parts[1])
+        dz = float(parts[2])
+        return self.solve(dx, dy, dz)
+    
     def solve_from_string(self, vector_str):
         """
         Helper method to solve from a space-separated string "dx dy dz".
         """
-        ns = vector_str.split(" ")
-        dx = float(ns[0]) 
-        dy = float(ns[1])
-        dz = float(ns[2])
+        parts = vector_str.split(" ")
+        dx = float(parts[0]) 
+        dy = float(parts[1])
+        dz = float(parts[2])
         return self.solve(dx, dy, dz)
 
-# Example usage:
-# solver = IKSolver()
-# angles = solver.solve_from_string("1 1 1")
-# print(angles)

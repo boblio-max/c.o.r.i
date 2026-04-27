@@ -3,10 +3,11 @@
 # ERRORS OBJECT FOR EASY ACCESS - TODAY
 import pygame
 import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from errors import *
 import math
-import os
-from vector import vector
+from ik_solver import IKSolver
 
 pygame.init()
 pygame.joystick.init()
@@ -50,6 +51,8 @@ for i in range(pygame.joystick.get_count()):
     joysticks.append(joy)
     print(f"Initialized Joystick {i}: {joy.get_name()}")
 
+# Initialize IK Solver
+solver = IKSolver(L=1.0)
 
 red_button = (255,255,255)
 blue_button = (255,255,255)
@@ -136,7 +139,7 @@ while running:
         vector1 = [ax0 * 3.0, -ax1 * 3.0, z * 3.0]
         vector_pass = f"{float(vector1[0])} {float(vector1[1])} {float(vector1[2])}"
         try:
-            angles = vector().update(vector_pass)
+            angles = solver.update(vector_pass)
         except Exception as e:
             logs.append(str(e))
 
