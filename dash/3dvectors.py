@@ -9,52 +9,6 @@ from ik_solver import IKSolver
 # Initialize IK Solver
 solver = IKSolver(L=1.0)
 
-# Vector utility class for forward kinematics
-class VectorCalculator:
-    def __init__(self, L=1.0):
-        self.L = L
-    
-    def calculate_positions(self, target_vector_str):
-        """Calculate joint positions A, B, C, D from target vector"""
-        # Get angles from IK solver
-        angles = solver.update(target_vector_str)
-        A1 = np.radians(angles['A1'])
-        A2 = np.radians(angles['A2'])
-        A3 = np.radians(angles['A3'])
-        A4 = np.radians(angles['A4'])
-        
-        L = self.L
-        
-        # Forward kinematics to get joint positions
-        # Joint A (Base)
-        A = np.array([0.0, 0.0, 0.0])
-        
-        # Joint B (Shoulder)
-        B = np.array([
-            L * np.cos(A2) * np.cos(A1),
-            L * np.cos(A2) * np.sin(A1),
-            L * np.sin(A2)
-        ])
-        
-        # Joint C (Elbow)
-        C = B + np.array([
-            L * np.cos(A2 + A3) * np.cos(A1),
-            L * np.cos(A2 + A3) * np.sin(A1),
-            L * np.sin(A2 + A3)
-        ])
-        
-        # Joint D (Wrist)
-        D = C + np.array([
-            L * np.cos(A2 + A3 + A4) * np.cos(A1),
-            L * np.cos(A2 + A3 + A4) * np.sin(A1),
-            L * np.sin(A2 + A3 + A4)
-        ])
-        
-        return A, B, C, D
-
-# Initialize calculator
-vec = VectorCalculator(L=1.0)
-
 # Initialize Pygame and Joystick
 pygame.init()
 pygame.joystick.init()
@@ -80,8 +34,8 @@ A3 = 0
 A4 = 0
 x = 0.5  # Movement step
 x_val, y_val, z_val = 0.5, 0.5, 0.5
-n = f"{x_val} {y_val} {z_val}"
-a, b, c, d = vec.calculate_positions(n)
+n = (x_val, y_val, z_val)
+
 def project(vector, angle_x, angle_y):
     # Rotation Matrices
     ry = np.array([
@@ -102,8 +56,6 @@ running = True
 while running:
     dt = clock.tick(60) / 1000.0
 
-    a, b, c, d = vec.calculate_positions(n)
-    # print(f"Updated Vectors: A={a}, B={b}, C={c}, D={d}")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -126,11 +78,11 @@ while running:
             z_val = 0.0
     
     # Increment x_val each frame for continuous movement
-    x_val += x
+    x_val = x_val
     
     # Update target vector
-    n = f"{x_val} {y_val} {z_val}"
-    a, b, c, d = vec.calculate_positions(n)
+    n = (x_val * 30, y_val * 30, z_val * 30)
+
     # 2. Handle Keyboard Input for Camera Rotation
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:  
@@ -142,9 +94,8 @@ while running:
     if keys[pygame.K_DOWN]:  
         angle_x += 2 * dt
 
-    ab = np.array(b) - np.array(a)
-    bc = np.array(c) - np.array(b)
-    cd = np.array(d) - np.array(c)
+    a, b, c, d = solver.update_vect(n)
+    
     vectors = [
         {'color': (255, 0, 0), 'vec': np.array([100, 0, 0])},   # X (Red)
         {'color': (0, 255, 0), 'vec': np.array([0, 100, 0])},   # Y (Green)
@@ -152,11 +103,8 @@ while running:
         {'color': (255, 0, 0), 'vec': np.array([-100, 0, 0])},  # X (Red)
         {'color': (0, 255, 0), 'vec': np.array([0, -100, 0])},  # Y (Green)
         {'color': (0, 0, 255), 'vec': np.array([0, 0, -100])},   # Z (Blue)
-        {'color': (255, 255, 255), 'vec': np.array([x_val, y_val, z_val])},
-        {'color': (200, 200, 255), 'vec': a * 50},
-        {"color": (255, 0, 0), 'vec': ab * 50},
-        {"color": (0, 255, 0), 'vec': bc * 50},
-        {"color": (0, 0, 255), 'vec': cd * 50},
+        {'color': (255, 255, 255), 'vec': np.array([x_val* 30, y_val * 30, z_val * 30])},
+        {'color': (0, 0, 255), 'vec': np.array([0, 0, -100])}
         ]   
 
     # 4. Drawing
