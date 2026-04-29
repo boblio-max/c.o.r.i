@@ -5,9 +5,9 @@ from mediapipe.tasks.python import vision
 import urllib.request
 import os
 import math
-from vector import vector
+from ik_solver import IKSolver
 
-vec = vector()
+vec = IKSolver()
 MODEL = "hand_landmarker.task"
 if not os.path.exists(MODEL):
     print("Downloading model...")
