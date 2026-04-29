@@ -310,9 +310,9 @@ while running:
     status_x = width - 40
     status_y = height//2 - 40
     for i, (label, value) in enumerate([("X", 42), ("Y", 180), ("Z", 90)]):
-        status_lbl = small_font.render(f"{label}: {value}mm", True, TEXT_COLOR)
-        screen.blit(status_lbl, (status_x - status_lbl.get_width(), status_y + i*25))
-
+        #status_lbl = small_font.render(f"{label}: {value}mm", True, TEXT_COLOR)
+        #screen.blit(status_lbl, (status_x - status_lbl.get_width(), status_y + i*25))
+        pass
     pygame.display.flip()
 
 pygame.quit()

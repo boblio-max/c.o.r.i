@@ -52,6 +52,9 @@ def project(vector, angle_x, angle_y):
     rotated = rx @ (ry @ vector)
     return int(rotated[0] + width/2), int(rotated[1] + height/2)
 
+scale = 1.0
+is_shown = True
+
 running = True
 while running:
     dt = clock.tick(60) / 1000.0
@@ -82,7 +85,7 @@ while running:
     
     # Update target vector
     n = (x_val * 30, y_val * 30, z_val * 30)
-
+    
     # 2. Handle Keyboard Input for Camera Rotation
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:  
@@ -91,33 +94,78 @@ while running:
         angle_y += 2 * dt
     if keys[pygame.K_UP]:    
         angle_x -= 2 * dt
-    if keys[pygame.K_DOWN]:  
+    if keys[pygame.K_DOWN]: 
         angle_x += 2 * dt
+    if keys[pygame.K_PAGEUP]:
+        scale += 0.1
+    if keys[pygame.K_PAGEDOWN]:
+        if scale > 0.0:
+            scale -= 0.1
+        else:
+            scale = 0
+    if keys[pygame.K_r]:
+        scale = 1.0
+        angle_x, angle_y = 0, 0
+    if keys[pygame.K_s]:
+        is_shown = not is_shown
+    if keys[pygame.K_ESCAPE]:
+        running = False
+    if keys[pygame.K_x]:
+        angle_x, angle_y = 1.63, 1.57
+    if keys[pygame.K_y]:
+        angle_x, angle_y = 0.03, 0
+    if keys[pygame.K_z]:
+        angle_x, angle_y = 1.56, 0
 
-    a, b, c, d = solver.update_vect(n)
+    a, b, c = solver.update_vect(n)
     
     vectors = [
-        {'color': (255, 0, 0), 'vec': np.array([100, 0, 0])},   # X (Red)
-        {'color': (0, 255, 0), 'vec': np.array([0, 100, 0])},   # Y (Green)
-        {'color': (0, 0, 255), 'vec': np.array([0, 0, 100])},   # Z (Blue)
-        {'color': (255, 0, 0), 'vec': np.array([-100, 0, 0])},  # X (Red)
-        {'color': (0, 255, 0), 'vec': np.array([0, -100, 0])},  # Y (Green)
-        {'color': (0, 0, 255), 'vec': np.array([0, 0, -100])},   # Z (Blue)
-        {'color': (255, 255, 255), 'vec': np.array([x_val* 30, y_val * 30, z_val * 30])},
-        {'color': (0, 0, 255), 'vec': np.array([0, 0, -100])}
-        ]   
-
+            {'color': (255, 0, 0), 'vec': np.array([100 * scale, 0, 0])},   # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, 100 * scale, 0])},   # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, 100 * scale])},   # Z (Blue)
+            {'color': (255, 0, 0), 'vec': np.array([-100 * scale, 0, 0])},  # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, -100 * scale, 0])},  # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, -100 * scale])},   # Z (Blue)
+            {'color': (255, 255, 255), 'vec': np.array([x_val* 40 * scale, y_val * 40 * scale, z_val * 40 * scale])}
+        ]
+    if is_shown:
+        vectors = [
+            {'color': (255, 0, 0), 'vec': np.array([100 * scale, 0, 0])},   # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, 100 * scale, 0])},   # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, 100 * scale])},   # Z (Blue)
+            {'color': (255, 0, 0), 'vec': np.array([-100 * scale, 0, 0])},  # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, -100 * scale, 0])},  # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, -100 * scale])},   # Z (Blue)
+            {'color': (255, 255, 255), 'vec': np.array([x_val* 40 * scale, y_val * 40 * scale, z_val * 40 * scale])},
+            {'color': (0, 0, 255), 'vec': np.array([a[0] * 40 * scale, a[1] * 40 * scale, a[2] * 40 * scale])},
+            {'color': (255, 255, 0), 'vec': np.array([b[0] * 40 * scale, b[1] * 40 * scale, b[2] * 40 * scale])},
+            {'color': (255, 0, 255), 'vec': np.array([c[0] * 40 * scale, c[1] * 40 * scale, c[2] * 40 * scale])}
+            ]   
+        
     # 4. Drawing
     screen.fill((20, 20, 20))
     origin = (int(width/2), int(height/2))
+    center = origin  # Keep track of center for arm vectors
     i = 0
+    accumulated_vec = np.array([0.0, 0.0, 0.0])  # For chaining arm vectors
+    arm_start = center
     for v_info in vectors:
         i += 1
-        end_pos = project(v_info['vec'], angle_x, angle_y)
-        pygame.draw.line(screen, v_info['color'], origin, end_pos, 3)
-        pygame.draw.circle(screen, v_info['color'], end_pos, 5)
-        if i > 6:
-            origin = end_pos
+        current_vec = v_info['vec']
+        
+        # For arm vectors (indices 7, 8, 9 when is_shown), chain them together
+        if is_shown and i > 7:
+            end_pos = project(accumulated_vec + current_vec, angle_x, angle_y)
+            pygame.draw.line(screen, v_info['color'], arm_start, end_pos, 3)
+            pygame.draw.circle(screen, v_info['color'], end_pos, 5)
+            accumulated_vec += current_vec
+            arm_start = end_pos
+        else:
+            end_pos = project(current_vec, angle_x, angle_y)
+            pygame.draw.line(screen, v_info['color'], origin, end_pos, 3)
+            pygame.draw.circle(screen, v_info['color'], end_pos, 5)
+            if i > 6:
+                origin = end_pos
     pygame.display.flip()
 
 pygame.quit()
