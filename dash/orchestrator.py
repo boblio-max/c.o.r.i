@@ -13,7 +13,7 @@ if __name__ == "__main__":
         stderr=subprocess.PIPE
     )
     dashboard_process = subprocess.Popen(
-        [sys.executable, os.path.join(script_dir, "testdash.py")],
+        [sys.executable, os.path.join(script_dir, "dashboard.py")],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )

@@ -5,7 +5,7 @@ from mediapipe.tasks.python import vision
 import urllib.request
 import os
 import math
-from ik_solver import IKSolver
+from math.ik_solver import IKSolver
 
 vec = IKSolver()
 MODEL = "hand_landmarker.task"
