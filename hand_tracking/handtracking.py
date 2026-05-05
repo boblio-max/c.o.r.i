@@ -10,9 +10,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ik_solver import IKSolver
 import numpy as np
 import pygame
-
+import websockets
+import asyncio
+import json
 pygame.init()
 pygame.joystick.init()
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
+PORT = 8765
 
 vec = IKSolver()
 MODEL = "hand_landmarker.task"
@@ -25,6 +31,22 @@ if not os.path.exists(MODEL):
     print("Done.")
 
 latest_result = None
+
+
+def in_range(value, target, deviance):
+    if value <= target + deviance and value >= target - deviance:
+        return True
+    else:
+        return False
+async def main(host, port, values):
+    uri = f"ws://{host}:{port}/ws"
+    try:
+        async with websockets.connect(uri) as ws:
+            payload = [int(v) for v in values]
+            await ws.send(json.dumps(payload, separators=(",", ":")))
+            # print(f"Successfully sent {payload} to {uri}")
+    except Exception as e:
+        print(f"Failed to connect or send: {e}")
 
 def callback(result, output_image, timestamp_ms):
     global latest_result
@@ -69,9 +91,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
         if latest_result:
             for hand_landmarks in latest_result.hand_landmarks:
                 pts = [(int(lm.x * w), int(lm.y * h)) for lm in hand_landmarks]
-                if pts[12] == pts[8] and pts[8] == pts[4]:
-                    print("grab")
-                    angles[4] = 180
+                
                 
                 a,b = pts[12]
                 x,y = pts[9]
@@ -100,7 +120,16 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                         angle = np.cos((distance - 50) / 100 * math.pi) * 90
                         cv2.line(frame, (x,y), (n0, n1),(0, 255, 0), 2)
                         angles[3] = int(angle)
-                        
+                    
+                    # INDEX To THUMB Touching
+                    if in_range(pts[4][0], pts[8][0], 15) and in_range(pts[4][1], pts[8][1], 15):
+                        print("grab")
+                        angles[4] = 180
+                    
+                    
+                    if in_range(pts[11][0], pts[9][0], 15) and in_range(pts[11][1], pts[9][1], 15) and in_range(pts[13][0], pts[15][0], 15) and in_range(pts[13][1], pts[15][1], 15) or in_range(pts[19][0], pts[17][0], 15) and in_range(pts[19][1], pts[17][1], 15) and in_range(pts[11][1], pts[9][1], 15) and in_range(pts[13][0], pts[15][0], 15) and in_range(pts[13][1], pts[15][1], 15) or in_range(pts[3][0], pts[7][0], 15) and in_range(pts[3][1], pts[7][1], 15) and in_range(pts[2][0], pts[6][0], 15) and in_range(pts[2][1], pts[6][1], 15):
+                        print("point")
+
                     width = x2 - x1
                     height = y2 - y1
 
@@ -130,7 +159,13 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     vector_pass = f"{scaled_x} {scaled_y} {scaled_z}"
                     angles = vec.update(vector_pass)
                     # print(f"Servo Angles: {angles}")
-
+                    joint_angles = [int(a) for a in angles]
+                    try:
+                        asyncio.run(main(HOST, PORT, joint_angles))
+                    except Exception as e:
+                        #REPLACE WITH LOGGING
+                        pass
+                        # logs.append(f"Failed to send data: {e}")
                     if keys[pygame.K_r]:
                         is_rotating = True
                     if keys[pygame.K_s]:

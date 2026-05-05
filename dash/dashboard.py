@@ -274,6 +274,7 @@ while running:
     except Exception as e:
         #REPLACE WITH LOGGING
         pass
+        # logs.append(f"Failed to send data: {e}")
     # Rendering
     screen.fill(BACKGROUND)
     a, b, c, d = vec.calculate_positions(n)
