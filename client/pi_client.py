@@ -70,8 +70,8 @@ async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: 
                         numbers = [float(x) for x in data]
                         print("RECV:", numbers)
 
-                        for i, v in enumerate(numbers):
-                            kit.servo[15-i].angle = int(v)
+                        for i, v in enumerate(int(n) for n in numbers):
+                            kit.servo[15-i].angle = v
                         # Process movement
                         # Pass 'actuate_flag and not dry_run' to determine if physical movement happens
                         await handle_payload(numbers, actuate_flag and not dry_run, kit)

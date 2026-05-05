@@ -3,12 +3,27 @@ import sys
 import math
 import os
 import numpy as np
+import asyncio
+import json
+import websockets
 
 # Add parent directory to path to import ik_solver
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
+PORT = 8765
 
 from ik_solver import IKSolver
 
+
+async def main(host, port, values):
+    uri = f"ws://{host}:{port}/ws"
+    try:
+        async with websockets.connect(uri) as ws:
+            payload = [int(v) for v in values]
+            await ws.send(json.dumps(payload, separators=(",", ":")))
+            # print(f"Successfully sent {payload} to {uri}")
+    except Exception as e:
+        print(f"Failed to connect or send: {e}")
 
 class VectorCalculator:
     def __init__(self, L=1.0):
@@ -129,7 +144,7 @@ font = pygame.font.SysFont('Arial', 20, bold=True)
 small_font = pygame.font.SysFont('Arial', 14)
 logs_font = pygame.font.SysFont('Consolas', 15)
 
-joint_angles = [180, 180, 90, 90]
+joint_angles = [180.0, 180.0, 90.0, 90.0, 0.0, 0.0]
 col_xs = [width // 6, width // 2.5]
 row_ys = [height // 12 + 40, height // 2 - 120]
 circle_positions = []
@@ -178,7 +193,7 @@ while running:
                     is_clicked = not is_clicked
                     logs.append("Claw Activated" if is_clicked else "Claw Deactivated")
                     green_button = SUCCESS if is_clicked else PANEL_BG
-                    joint_angles[0] = 40 if is_clicked else 180
+                    joint_angles[0] = 40.0 if is_clicked else 180.0
                     
                 elif event.button == 1:
                     is_clicked_ai = not is_clicked_ai
@@ -194,7 +209,7 @@ while running:
                     logs.append("Predefined pose activated")
                     yellow_button = WARNING if not is_clicked3 else PANEL_BG
                     is_clicked3 = not is_clicked3
-                    joint_angles = [40, 110, 150, 80] if is_clicked3 else [180, 180, 90, 90]
+                    joint_angles = [40.0, 110.0, 150.0, 80.0, 0.0, 0.0] if is_clicked3 else [180.0, 180.0, 90.0, 90.0, 0.0, 0.0]
 
             except Exception:
                 pass    
@@ -237,7 +252,7 @@ while running:
             a3 = float(angles.get("A3", joint_angles[2]))
             a4 = float(angles.get("A4", joint_angles[3]))
         except Exception:
-            a1, a2, a3, a4 = joint_angles
+            a1, a2, a3, a4, un, un1 = joint_angles
 
         def norm360(x):
             return (x % 360 + 360) % 360
@@ -246,12 +261,15 @@ while running:
             return max(0, min(180, x))
 
         joint_angles = [
-            int(round(norm360(a1))),
-            int(round(clamp0_180(a2))),
-            int(round(clamp0_180(a3))),
-            int(round(clamp0_180(a4)))
+            (round(norm360(a1))),
+            round(clamp0_180(a2)),
+            round(clamp0_180(a3)),
+            round(clamp0_180(a4)),
+            0.0,
+            0.0
         ]
 
+    asyncio.run(main(HOST, PORT, joint_angles))
     # Rendering
     screen.fill(BACKGROUND)
     a, b, c, d = vec.calculate_positions(n)
