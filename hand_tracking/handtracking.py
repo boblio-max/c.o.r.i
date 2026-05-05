@@ -5,7 +5,12 @@ from mediapipe.tasks.python import vision
 import urllib.request
 import os
 import math
-from math.ik_solver import IKSolver
+from ik_solver import IKSolver
+import numpy as np
+import pygame
+
+pygame.init()
+pygame.joystick.init()
 
 vec = IKSolver()
 MODEL = "hand_landmarker.task"
@@ -42,7 +47,8 @@ cap = cv2.VideoCapture(0)
 ts = 0
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
+angles = [0,0,0,0, 0]
+is_rotating = False
 with vision.HandLandmarker.create_from_options(options) as landmarker:
     while cap.isOpened():
         ret, frame = cap.read()
@@ -60,6 +66,25 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
         if latest_result:
             for hand_landmarks in latest_result.hand_landmarks:
                 pts = [(int(lm.x * w), int(lm.y * h)) for lm in hand_landmarks]
+                if pts[12] == pts[8] and pts[8] == pts[4]:
+                    print("grab")
+                    angles[4] = 180
+                
+                a,b = pts[12]
+                x,y = pts[9]
+
+                keys = pygame.key.get_pressed()
+
+                if keys[pygame.K_R]:
+                    if not is_rotating:
+                        is_rotating = True
+                        cv2.circle(frame, (x, y), 100, (255, 0, 0), 2)
+                        distance = math.fabs((b-y))/(math.fabs(a - x))
+                        angle = np.cosine((distance - 50) / 100 * math.pi) * 90
+                        angles[3] = int(angle)
+                    else:
+                        is_rotating = not is_rotating
+                    
                 for a, b in CONNECTIONS:
                     cv2.line(frame, pts[a], pts[b], (0, 255, 0), 2)
                 for pt in pts:
@@ -99,8 +124,9 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     # print(f"3d vector: ({scaled_x}, {scaled_y}, {scaled_z})")
                     vector_pass = f"{scaled_x} {scaled_y} {scaled_z}"
                     angles = vec.update(vector_pass)
-                    print(f"Servo Angles: {angles}")
+                    # print(f"Servo Angles: {angles}")
 
+            
         cv2.imshow("Hand Tracking", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

@@ -195,8 +195,22 @@ while running:
                     yellow_button = WARNING if not is_clicked3 else PANEL_BG
                     is_clicked3 = not is_clicked3
                     joint_angles = [40, 110, 150, 80] if is_clicked3 else [180, 180, 90, 90]
+
             except Exception:
-                pass
+                pass    
+        elif event.type == pygame.JOYHATMOTION:
+            # event.hat is the hat index (usually 0)
+            # event.value is the (x, y) tuple
+            x, y = event.value
+            if x == 1:
+                print("D-pad Right")
+            elif x == -1:
+                print("D-pad Left")
+            if y == 1:
+                print("D-pad Up")
+            elif y == -1:
+                print("D-pad Down")
+            
 
     # Process joystick input
     angles = None
