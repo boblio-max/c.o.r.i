@@ -5,7 +5,7 @@ from mediapipe.tasks.python import vision
 import urllib.request
 import os
 import math
-from ik_solver import IKSolver
+from math.ik_solver import IKSolver
 import numpy as np
 import pygame
 

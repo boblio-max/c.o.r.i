@@ -4,7 +4,7 @@ import numpy as np
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ik_solver import IKSolver
+from math.ik_solver import IKSolver
 
 # Initialize IK Solver
 solver = IKSolver(L=1.0)
