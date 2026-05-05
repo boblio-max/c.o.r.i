@@ -269,7 +269,11 @@ while running:
             0.0
         ]
 
-    asyncio.run(main(HOST, PORT, joint_angles))
+    try:
+        asyncio.run(main(HOST, PORT, joint_angles))
+    except Exception as e:
+        #REPLACE WITH LOGGING
+        pass
     # Rendering
     screen.fill(BACKGROUND)
     a, b, c, d = vec.calculate_positions(n)
