@@ -4,8 +4,10 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import urllib.request
 import os
+import sys
 import math
-from math.ik_solver import IKSolver
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ik_solver import IKSolver
 import numpy as np
 import pygame
 
@@ -49,6 +51,7 @@ cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
 cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 angles = [0,0,0,0, 0]
 is_rotating = False
+w = pygame.display.set_mode((800, 600))
 with vision.HandLandmarker.create_from_options(options) as landmarker:
     while cap.isOpened():
         ret, frame = cap.read()
@@ -75,15 +78,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
 
                 keys = pygame.key.get_pressed()
 
-                if keys[pygame.K_R]:
-                    if not is_rotating:
-                        is_rotating = True
-                        cv2.circle(frame, (x, y), 100, (255, 0, 0), 2)
-                        distance = math.fabs((b-y))/(math.fabs(a - x))
-                        angle = np.cosine((distance - 50) / 100 * math.pi) * 90
-                        angles[3] = int(angle)
-                    else:
-                        is_rotating = not is_rotating
+                
                     
                 for a, b in CONNECTIONS:
                     cv2.line(frame, pts[a], pts[b], (0, 255, 0), 2)
@@ -94,8 +89,18 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     y_coords = [p[1] for p in pts]
                     x1, y1 = min(x_coords) - 20, min(y_coords) - 20
                     x2, y2 = max(x_coords) + 20, max(y_coords) + 20
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
                     
+                    if not is_rotating:
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
+                    
+                    if is_rotating:
+                        n0, n1 = pts[9]
+                        cv2.circle(frame, (x, y), 100, (255, 0, 0), 2)
+                        distance = math.fabs((b-y))/(math.fabs(a - x))
+                        angle = np.cos((distance - 50) / 100 * math.pi) * 90
+                        cv2.line(frame, (x,y), (n0, n1),(0, 255, 0), 2)
+                        angles[3] = int(angle)
+                        
                     width = x2 - x1
                     height = y2 - y1
 
@@ -111,7 +116,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     disy = area - set_y
                     x,z = pts[9]
                     
-                    cv2.line(frame, (640, 360), (x,z), (255, 255, 0), 2)
+                    # cv2.line(frame, (640, 360), (x,z), (255, 255, 0), 2)
                     
                     disx = x - 640
                     disz = z - 360
@@ -126,8 +131,13 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     angles = vec.update(vector_pass)
                     # print(f"Servo Angles: {angles}")
 
-            
+                    if keys[pygame.K_r]:
+                        is_rotating = True
+                    if keys[pygame.K_s]:
+                        is_rotating = False
+                        
         cv2.imshow("Hand Tracking", frame)
+        pygame.display.flip()
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 

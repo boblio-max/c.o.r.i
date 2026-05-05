@@ -12,7 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
 PORT = 8765
 
-from math.ik_solver import IKSolver
+from ik_solver import IKSolver
 
 
 async def main(host, port, values):
