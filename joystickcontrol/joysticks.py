@@ -1,8 +1,11 @@
 import pygame
 # from adafruit_servokit import ServoKit
 import time
-import matplotlib.pyplot as plt
-from vector import vector
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from ik_solver import IKSolver
+
 pygame.init()
 pygame.joystick.init()
 # kit = ServoKit(channels=16)
@@ -21,7 +24,7 @@ aiMode = False
 originPl = True
 DEADZONE = 0.1
 vector1 = [0.0, 0.0, 0.0]
-vec = vector()
+ik_solver = IKSolver()
 
 while running:
     for event in pygame.event.get():
@@ -94,7 +97,7 @@ while running:
             
             # print("3D Vector:", vector1)
             vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
-            angles = vec.update(vector_pass)
+            angles = ik_solver.update(vector_pass)
             print(vector_pass)
             # print("Servo Angles:", angles)
             # kit.servo[11].angle = angles['A1']  # base

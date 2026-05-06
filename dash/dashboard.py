@@ -3,73 +3,36 @@ import sys
 import math
 import os
 import numpy as np
-import asyncio
-import json
-import websockets
-
+from ik_solver import IKSolver
+from ws_client import PersistentWebSocketClient
 # Add parent directory to path to import ik_solver
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
 PORT = 8765
 
-from ik_solver import IKSolver
-
-
-async def main(host, port, values):
-    uri = f"ws://{host}:{port}/ws"
-    try:
-        async with websockets.connect(uri) as ws:
-            payload = [int(v) for v in values]
-            await ws.send(json.dumps(payload, separators=(",", ":")))
-            # print(f"Successfully sent {payload} to {uri}")
-    except Exception as e:
-        print(f"Failed to connect or send: {e}")
 
 class VectorCalculator:
+    """Wrapper around IKSolver for convenient position calculations"""
     def __init__(self, L=1.0):
         self.L = L
-        self.solver = IKSolver()
+        self.solver = IKSolver(L=L)
     
     def calculate_positions(self, target_vector_str):
         """Calculate joint positions A, B, C, D from target vector"""
-        # Get angles from IK solver
-        angles = self.solver.update(target_vector_str)
-        A1 = np.radians(angles['A1'])
-        A2 = np.radians(angles['A2'])
-        A3 = np.radians(angles['A3'])
-        A4 = np.radians(angles['A4'])
-        
-        L = self.L
-        
-        # Forward kinematics to get joint positions
-        # Joint A (Base)
-        A = np.array([0.0, 0.0, 0.0])
-        
-        # Joint B (Shoulder)
-        B = np.array([
-            L * np.cos(A2) * np.cos(A1),
-            L * np.cos(A2) * np.sin(A1),
-            L * np.sin(A2)
-        ])
-        
-        # Joint C (Elbow)
-        C = B + np.array([
-            L * np.cos(A2 + A3) * np.cos(A1),
-            L * np.cos(A2 + A3) * np.sin(A1),
-            L * np.sin(A2 + A3)
-        ])
-        
-        # Joint D (Wrist)
-        D = C + np.array([
-            L * np.cos(A2 + A3 + A4) * np.cos(A1),
-            L * np.cos(A2 + A3 + A4) * np.sin(A1),
-            L * np.sin(A2 + A3 + A4)
-        ])
-        
-        return A, B, C, D
+        result = self.solver.get_joint_positions(*self._parse_vector(target_vector_str))
+        return result['A'], result['B'], result['C'], result['D']
+    
+    def _parse_vector(self, vector_str):
+        """Parse space-separated vector string to floats"""
+        parts = vector_str.split()
+        return float(parts[0]), float(parts[1]), float(parts[2])
 
 # Initialize calculator
 vec = VectorCalculator(L=1.0)
+
+# Initialize WebSocket client
+ws_client = PersistentWebSocketClient(host=HOST, port=PORT)
+ws_client.start()
 
 # Initialize Pygame and Joystick
 pygame.init()
@@ -269,12 +232,8 @@ while running:
             0.0
         ]
 
-    try:
-        asyncio.run(main(HOST, PORT, joint_angles))
-    except Exception as e:
-        #REPLACE WITH LOGGING
-        pass
-        # logs.append(f"Failed to send data: {e}")
+    # Send joint angles to server (non-blocking)
+    ws_client.send(joint_angles)
     # Rendering
     screen.fill(BACKGROUND)
     a, b, c, d = vec.calculate_positions(n)
@@ -352,5 +311,7 @@ while running:
         pass
     pygame.display.flip()
 
+# Cleanup
+ws_client.stop()
 pygame.quit()
 sys.exit()

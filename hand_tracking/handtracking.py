@@ -15,12 +15,12 @@ import asyncio
 import json
 pygame.init()
 pygame.joystick.init()
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
 PORT = 8765
 
-vec = IKSolver()
+# Initialize IK solver for calculating joint angles from hand position
+ik_solver = IKSolver()
 MODEL = "hand_landmarker.task"
 if not os.path.exists(MODEL):
     print("Downloading model...")
@@ -157,9 +157,13 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     
                     # print(f"3d vector: ({scaled_x}, {scaled_y}, {scaled_z})")
                     vector_pass = f"{scaled_x} {scaled_y} {scaled_z}"
-                    angles = vec.update(vector_pass)
-                    # print(f"Servo Angles: {angles}")
-                    joint_angles = [int(a) for a in angles]
+                    angles_dict = ik_solver.update(vector_pass)
+                    # Update angles with IK solution (keep angles[4] for grabber/claw)
+                    angles[0] = int(angles_dict['A1'])
+                    angles[1] = int(angles_dict['A2'])
+                    angles[2] = int(angles_dict['A3'])
+                    angles[3] = int(angles_dict['A4'])
+                    joint_angles = angles
                     try:
                         asyncio.run(main(HOST, PORT, joint_angles))
                     except Exception as e:
