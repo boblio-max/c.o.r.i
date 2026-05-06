@@ -126,7 +126,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                         print("grab")
                         angles[4] = 180
                     
-                    
+                    # Point gesture (index, middle, and ring fingers all touching)
                     if in_range(pts[11][0], pts[9][0], 15) and in_range(pts[11][1], pts[9][1], 15) and in_range(pts[13][0], pts[15][0], 15) and in_range(pts[13][1], pts[15][1], 15) or in_range(pts[19][0], pts[17][0], 15) and in_range(pts[19][1], pts[17][1], 15) and in_range(pts[11][1], pts[9][1], 15) and in_range(pts[13][0], pts[15][0], 15) and in_range(pts[13][1], pts[15][1], 15) or in_range(pts[3][0], pts[7][0], 15) and in_range(pts[3][1], pts[7][1], 15) and in_range(pts[2][0], pts[6][0], 15) and in_range(pts[2][1], pts[6][1], 15):
                         print("point")
 
