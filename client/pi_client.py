@@ -1,23 +1,30 @@
+# C.O.R.I Raspberry Pi Client
+# This script runs on the actual Pi. It listens for commands from the server
+# and then tells the servos exactly how to move. It's the robot's nervous system!
+
 import asyncio
 import json
 import logging
 import argparse
 from typing import List
 
-# Third-party imports
+# Third-party imports - websockets for talking, servokit for moving.
 import websockets
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
-# Set up logging
+# Set up logging so we can see what's happening in the terminal.
 LOG = logging.getLogger("pi_client")
 WS_PATH = "/ws"
 
+# We check if adafruit_servokit is installed. If not, we run in "dry-run" mode.
+# This is super helpful for testing on a laptop without the actual hardware.
 try:
     from adafruit_servokit import ServoKit
 except ImportError:
     ServoKit = None
     LOG.warning("adafruit_servokit not found. Actuation will be disabled.")
 
+<<<<<<< Updated upstream
 # Servo channel mapping
 # Adjust these indices based on your servo setup
 SERVO_MAP = {
@@ -39,6 +46,10 @@ SERVO_INDICES = [
 ]
 
 
+=======
+# This function is where the physical movement happens.
+# It takes the joint values and applies them to the servos if we're not in dry-run mode.
+>>>>>>> Stashed changes
 async def handle_payload(values: List[float], actuate: bool, kit: 'ServoKit | None'):
     """
     Handles the actual movement of servos based on received values.
@@ -57,9 +68,14 @@ async def handle_payload(values: List[float], actuate: bool, kit: 'ServoKit | No
             LOG.error("Actuation requested but ServoKit is not initialized")
             return
         
+<<<<<<< Updated upstream
         # Map values to servo indices and set angles
         for i, (v, servo_idx) in enumerate(zip(values, SERVO_INDICES)):
             # Clamp angle to valid servo range (0-180)
+=======
+        # Map values to servo angles (clamped between 0 and 180 degrees).
+        for i, v in enumerate(values):
+>>>>>>> Stashed changes
             angle = max(0, min(180, int(v)))
             try:
                 kit.servo[servo_idx].angle = angle
@@ -83,7 +99,7 @@ async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: 
                 LOG.info("Connected to server")
                 backoff = 1 # Reset backoff on successful connection
 
-                # Register as the Pi
+                # We have to tell the server that we are the Pi so it knows where to send data.
                 await ws.send(json.dumps({"role": "pi"}))
                 LOG.info("Sent registration as Pi")
 

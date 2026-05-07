@@ -1,3 +1,8 @@
+# C.O.R.I Hand Tracking - Computer Vision Interface
+# This is the coolest part of the project! It uses your webcam to track your hand 
+# landmarks and converts your hand movements into robot joint commands.
+# It's basically like controlling the robot with "The Force".
+
 import cv2
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -6,10 +11,13 @@ import urllib.request
 import os
 import sys
 import math
+
+# Add parent directory for ik_solver access.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ik_solver import IKSolver
 import numpy as np
 import pygame
+<<<<<<< Updated upstream
 import websockets
 import asyncio
 import json
@@ -21,6 +29,17 @@ PORT = 8765
 
 # Initialize IK solver for calculating joint angles from hand position
 ik_solver = IKSolver()
+=======
+
+# Initialize Pygame and our IK Solver.
+pygame.init()
+pygame.joystick.init()
+
+vec = IKSolver()
+
+# We need a specific model file for MediaPipe to work. 
+# If it's not here, we'll just download it automatically.
+>>>>>>> Stashed changes
 MODEL = "hand_landmarker.task"
 if not os.path.exists(MODEL):
     print("Downloading model...")
@@ -32,6 +51,7 @@ if not os.path.exists(MODEL):
 
 latest_result = None
 
+<<<<<<< Updated upstream
 
 def in_range(value, target, deviance):
     if value <= target + deviance and value >= target - deviance:
@@ -48,6 +68,10 @@ async def main(host, port, values):
     except Exception as e:
         print(f"Failed to connect or send: {e}")
 
+=======
+# This callback is called every time the AI finishes processing a frame.
+# It updates our latest_result so the main loop can use it.
+>>>>>>> Stashed changes
 def callback(result, output_image, timestamp_ms):
     global latest_result
     latest_result = result
@@ -58,6 +82,8 @@ options = vision.HandLandmarkerOptions(
     result_callback=callback
 )
 
+# These connections define how to draw the hand "skeleton" on the screen.
+# It's just a list of which landmarks should have lines between them.
 CONNECTIONS = [
     (0,1),(1,2),(2,3),(3,4),
     (0,5),(5,6),(6,7),(7,8),
@@ -151,11 +177,12 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     disz = z - 360
                     
                     # print(f"distance from center: ({disx}, {disz})")
+                    # We scale the distances to get a 3D vector our solver can understand.
                     scaled_x = (disx / max_disx) * 3
                     scaled_y = (disy / max_disy) * 3
                     scaled_z = (disz / max_disz) * 3
                     
-                    # print(f"3d vector: ({scaled_x}, {scaled_y}, {scaled_z})")
+                    # Finally, we pass the vector to the IK solver to get the joint angles.
                     vector_pass = f"{scaled_x} {scaled_y} {scaled_z}"
                     angles_dict = ik_solver.update(vector_pass)
                     # Update angles with IK solution (keep angles[4] for grabber/claw)

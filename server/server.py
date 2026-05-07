@@ -1,3 +1,8 @@
+# C.O.R.I Communication Server
+# This is the central bridge. It sits in the middle and relays messages 
+# between the dashboard (or hand tracking) and the Raspberry Pi.
+# It's basically the mailman of the whole system.
+
 import asyncio
 import json
 import logging
@@ -7,6 +12,7 @@ from typing import Sequence, Optional, Any
 import websockets
 from websockets.exceptions import ConnectionClosedError
 
+# Default network settings
 HOST_DEFAULT = "0.0.0.0"
 PORT_DEFAULT = 8765
 WS_PATH = "/ws"
@@ -15,6 +21,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 LOG = logging.getLogger("ws_server")
 
 
+# The WSServer class manages all the incoming connections.
 class WSServer:
     """Async WebSocket server that keeps the last-connected client and sends JSON arrays."""
 
@@ -37,8 +44,8 @@ class WSServer:
             peer = websocket.remote_address
             LOG.info("Client connected: %s", peer)
 
-            # Listen for messages. A client can register itself as the hardware Pi by
-            # sending a JSON message: {"role":"pi"}. Only the registered Pi receives forwarded payloads.
+            # This is the important part: a client can say "I'm the Pi" so the server 
+            # knows who to forward the joint data to.
             async for msg in websocket:
                 # Attempt to parse JSON
                 try:
@@ -107,7 +114,7 @@ class WSServer:
 
     async def publish(self, payload: Sequence[float], timeout: float = 0.1) -> bool:
         """
-        Send a JSON array of 6 numbers to the last-connected client.
+        Send a JSON array of 6 numbers to the last-connected client (the Pi).
 
         Returns True on success, False if no client or send failed.
         Raises ValueError for invalid payload.

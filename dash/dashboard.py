@@ -1,16 +1,49 @@
+# C.O.R.I Dashboard - The Main Control Hub
+# This script is basically the brain's visual interface. It uses Pygame to show us 
+# what's going on with the robot joints in real-time and lets us control it with a joystick.
+
 import pygame
 import sys
 import math
 import os
 import numpy as np
+<<<<<<< Updated upstream
 from ik_solver import IKSolver
 from ws_client import PersistentWebSocketClient
 # Add parent directory to path to import ik_solver
+=======
+import asyncio
+import json
+import websockets
+
+# We need to add the parent directory to the path so we can grab the ik_solver.
+# It's a bit of a hack, but it works perfectly for our file structure.
+>>>>>>> Stashed changes
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-HOST = "192.168.1.20"  # Replace with your Pi's IP or "localhost"
+
+# Networking setup - change the HOST to your Pi's IP if you're running this live.
+HOST = "192.168.1.20" 
 PORT = 8765
 
+<<<<<<< Updated upstream
+=======
+from ik_solver import IKSolver
 
+# This async function sends our joint values over to the server.
+# We're using websockets because they're fast and great for streaming data.
+async def main(host, port, values):
+    uri = f"ws://{host}:{port}/ws"
+    try:
+        async with websockets.connect(uri) as ws:
+            # We convert the values to ints to keep the payload clean.
+            payload = [int(v) for v in values]
+            await ws.send(json.dumps(payload, separators=(",", ":")))
+    except Exception as e:
+        print(f"Failed to connect or send: {e}")
+>>>>>>> Stashed changes
+
+# This class handles the math for converting vectors into joint positions.
+# It's essentially doing the heavy lifting for the visual part of the dashboard.
 class VectorCalculator:
     """Wrapper around IKSolver for convenient position calculations"""
     def __init__(self, L=1.0):
@@ -86,7 +119,8 @@ a, b, c, d = vec.calculate_positions(n)
 #         except:
 #             return {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0}
 
-# Modern color scheme
+# Color Palette - We're going for a modern, sleek look here.
+# These RGB values give that nice dark-mode aesthetic.
 BACKGROUND = (18, 18, 30)
 ACCENT_COLOR = (0, 200, 255)
 SECONDARY_ACCENT = (100, 255, 200)
@@ -96,6 +130,7 @@ WARNING = (255, 180, 50)
 DANGER = (255, 80, 80)
 SUCCESS = (80, 220, 150)
 
+# Gauge styling constants
 CIRCLE_R = 70
 CIRCLE_BORDER = 3
 NEEDLE_WIDTH = 3
@@ -137,11 +172,14 @@ is_clicked2 = False
 is_clicked3 = False
 running = True
 
+# Function to draw pretty rounded rectangles because standard pygame rects are too sharp.
 def draw_rounded_rect(surface, rect, color, radius=10, border=0):
     pygame.draw.rect(surface, color, rect, border_radius=radius)
     if border > 0:
         pygame.draw.rect(surface, (255, 255, 255), rect, border, border_radius=radius)
 
+# --- MAIN LOOP ---
+# This is where all the logic happens every single frame.
 while running:
     dt = clock.tick(60) / 1000.0
     n = f"0 0 0"

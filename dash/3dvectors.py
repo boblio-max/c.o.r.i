@@ -1,15 +1,20 @@
+# C.O.R.I 3D Vector Visualizer
+# This script is a super cool 3D renderer that helps us see the robot's target 
+# and its actual arm segments in a simulated 3D space. It's like a mini CAD view!
 
 import pygame
 import numpy as np
 import sys
 import os
+
+# Making sure we can find the ik_solver in the parent directory.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ik_solver import IKSolver
 
-# Initialize IK Solver
+# Initialize the IK Solver - this is what calculates the arm's math.
 solver = IKSolver(L=1.0)
 
-# Initialize Pygame and Joystick
+# Standard Pygame setup for our window.
 pygame.init()
 pygame.joystick.init()
 
@@ -36,19 +41,23 @@ x = 0.5  # Movement step
 x_val, y_val, z_val = 0.5, 0.5, 0.5
 n = (x_val, y_val, z_val)
 
+# The "Project" function is where the 3D magic happens.
+# It takes a 3D point and flattens it onto our 2D screen using rotation matrices.
+# Rotation matrices are essentially just a bunch of trig that rotates points around an axis.
 def project(vector, angle_x, angle_y):
-    # Rotation Matrices
+    # Y-axis rotation (left/right)
     ry = np.array([
         [np.cos(angle_y), 0, np.sin(angle_y)],
         [0, 1, 0],
         [-np.sin(angle_y), 0, np.cos(angle_y)]
     ])
+    # X-axis rotation (up/down)
     rx = np.array([
         [1, 0, 0],
         [0, np.cos(angle_x), -np.sin(angle_x)],
         [0, np.sin(angle_x), np.cos(angle_x)]
     ])
-    # Apply rotations and center on screen
+    # Apply the rotations and then shift it to the center of the screen.
     rotated = rx @ (ry @ vector)
     return int(rotated[0] + width/2), int(rotated[1] + height/2)
 
@@ -87,6 +96,7 @@ while running:
     n = (x_val * 30, y_val * 30, z_val * 30)
     
     # 2. Handle Keyboard Input for Camera Rotation
+    # We use these keys to fly around the 3D space.
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT]:  
         angle_y -= 2 * dt
@@ -96,6 +106,8 @@ while running:
         angle_x -= 2 * dt
     if keys[pygame.K_DOWN]: 
         angle_x += 2 * dt
+    
+    # Zoom controls
     if keys[pygame.K_PAGEUP]:
         scale += 0.1
     if keys[pygame.K_PAGEDOWN]:
@@ -103,13 +115,13 @@ while running:
             scale -= 0.1
         else:
             scale = 0
+            
+    # Reset camera view
     if keys[pygame.K_r]:
         scale = 1.0
         angle_x, angle_y = 0, 0
-    if keys[pygame.K_s]:
-        is_shown = not is_shown
-    if keys[pygame.K_ESCAPE]:
-        running = False
+    
+    # Preset camera angles (Top, Front, Side views)
     if keys[pygame.K_x]:
         angle_x, angle_y = 1.63, 1.57
     if keys[pygame.K_y]:
