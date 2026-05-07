@@ -7,40 +7,19 @@ import sys
 import math
 import os
 import numpy as np
-<<<<<<< Updated upstream
-from ik_solver import IKSolver
-from ws_client import PersistentWebSocketClient
-# Add parent directory to path to import ik_solver
-=======
 import asyncio
 import json
 import websockets
 
 # We need to add the parent directory to the path so we can grab the ik_solver.
 # It's a bit of a hack, but it works perfectly for our file structure.
->>>>>>> Stashed changes
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
+from ik_solver import IKSolver
+from ws_client import PersistentWebSocketClient
 # Networking setup - change the HOST to your Pi's IP if you're running this live.
 HOST = "192.168.1.20" 
 PORT = 8765
 
-<<<<<<< Updated upstream
-=======
-from ik_solver import IKSolver
-
-# This async function sends our joint values over to the server.
-# We're using websockets because they're fast and great for streaming data.
-async def main(host, port, values):
-    uri = f"ws://{host}:{port}/ws"
-    try:
-        async with websockets.connect(uri) as ws:
-            # We convert the values to ints to keep the payload clean.
-            payload = [int(v) for v in values]
-            await ws.send(json.dumps(payload, separators=(",", ":")))
-    except Exception as e:
-        print(f"Failed to connect or send: {e}")
->>>>>>> Stashed changes
 
 # This class handles the math for converting vectors into joint positions.
 # It's essentially doing the heavy lifting for the visual part of the dashboard.
@@ -90,37 +69,8 @@ x_val, y_val, z_val = 0.5, 0.5, 0.5
 n = f"{x_val} {y_val} {z_val}"
 a, b, c, d = vec.calculate_positions(n)
 
-# class vector:
-#     def update(self, vector_str):
-#         try:
-#             ns = vector_str.split(' ')
-#             dx, dy, dz = float(ns[0]), float(ns[1]), float(ns[2])
-#             L = 1.0
-#             A1 = np.degrees(np.arctan2(dy, dx))
-#             r = np.hypot(dx, dy)
-#             s = dz
-#             dist = np.hypot(r, s)
-#             max_reach = 3 * L - 1e-6
-#             if dist > max_reach:
-#                 scale = max_reach / dist
-#                 r *= scale
-#                 s *= scale
-            
-#             # IK calculation logic
-#             c2 = (r*r + s*s - 3*L*L) / (2*L*r) if r > 0.01 else 0
-#             c2 = np.clip(c2, -1.0, 1.0)
-#             A2 = np.degrees(np.arctan2(s, r) - np.arctan2(np.sqrt(1 - c2*c2), c2))
-#             c23 = (r - L*np.cos(np.radians(A2))) / (2*L)
-#             c23 = np.clip(c23, -1.0, 1.0)
-#             A3 = np.degrees(np.arccos(c23)) - A2
-#             A4 = A3 # Wrist mirrors elbow in this simplified model
-            
-#             return {'A1': A1, 'A2': A2, 'A3': A3, 'A4': A4}
-#         except:
-#             return {'A1': 0, 'A2': 0, 'A3': 0, 'A4': 0}
 
-# Color Palette - We're going for a modern, sleek look here.
-# These RGB values give that nice dark-mode aesthetic.
+
 BACKGROUND = (18, 18, 30)
 ACCENT_COLOR = (0, 200, 255)
 SECONDARY_ACCENT = (100, 255, 200)
