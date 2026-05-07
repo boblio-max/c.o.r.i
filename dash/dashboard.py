@@ -157,7 +157,7 @@ while running:
                     is_clicked2 = not is_clicked2
                     
                 elif event.button == 3:
-                    logs.append("Predefined pose activated")
+                    logs.append("Predefined pose activated" if not is_clicked3 else "Predefined pose deactivated")
                     yellow_button = WARNING if not is_clicked3 else PANEL_BG
                     is_clicked3 = not is_clicked3
                     joint_angles = [40.0, 110.0, 150.0, 80.0, 0.0, 0.0] if is_clicked3 else [180.0, 180.0, 90.0, 90.0, 0.0, 0.0]
@@ -196,7 +196,7 @@ while running:
     
     
     # Update joint angles
-    if angles:
+    if angles and not is_clicked3:
         try:
             a1 = float(angles.get("A1", joint_angles[0]))
             a2 = float(angles.get("A2", joint_angles[1]))

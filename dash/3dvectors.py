@@ -63,6 +63,7 @@ def project(vector, angle_x, angle_y):
 
 scale = 1.0
 is_shown = True
+reset = False
 
 running = True
 while running:
@@ -121,6 +122,8 @@ while running:
         scale = 1.0
         angle_x, angle_y = 0, 0
     
+    if keys[pygame.K_s]:
+        reset = not reset
     # Preset camera angles (Top, Front, Side views)
     if keys[pygame.K_x]:
         angle_x, angle_y = 1.63, 1.57
@@ -153,7 +156,20 @@ while running:
             {'color': (255, 255, 0), 'vec': np.array([b[0] * 40 * scale, b[1] * 40 * scale, b[2] * 40 * scale])},
             {'color': (255, 0, 255), 'vec': np.array([c[0] * 40 * scale, c[1] * 40 * scale, c[2] * 40 * scale])}
             ]   
-        
+    
+    if reset:
+        vectors = [
+            {'color': (255, 0, 0), 'vec': np.array([100 * scale, 0, 0])},   # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, 100 * scale, 0])},   # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, 100 * scale])},   # Z (Blue)
+            {'color': (255, 0, 0), 'vec': np.array([-100 * scale, 0, 0])},  # X (Red)
+            {'color': (0, 255, 0), 'vec': np.array([0, -100 * scale, 0])},  # Y (Green)
+            {'color': (0, 0, 255), 'vec': np.array([0, 0, -100 * scale])},   # Z (Blue)
+            {'color': (255, 255, 255), 'vec': np.array([x_val* 40 * scale, y_val * 40 * scale, z_val * 40 * scale])},
+            {'color': (0, 0, 255), 'vec': np.array([a[0] * 40 * scale, a[1] * 40 * scale, a[2] * 40 * scale])},
+            {'color': (255, 255, 0), 'vec': np.array([b[0] * 40 * scale, b[1] * 40 * scale, b[2] * 40 * scale])},
+            {'color': (255, 0, 255), 'vec': np.array([c[0] * 40 * scale, c[1] * 40 * scale, c[2] * 40 * scale])}
+        ]
     # 4. Drawing
     screen.fill((20, 20, 20))
     origin = (int(width/2), int(height/2))
