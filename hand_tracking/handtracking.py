@@ -17,7 +17,6 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ik_solver import IKSolver
 import numpy as np
 import pygame
-<<<<<<< Updated upstream
 import websockets
 import asyncio
 import json
@@ -29,7 +28,6 @@ PORT = 8765
 
 # Initialize IK solver for calculating joint angles from hand position
 ik_solver = IKSolver()
-=======
 
 # Initialize Pygame and our IK Solver.
 pygame.init()
@@ -39,7 +37,6 @@ vec = IKSolver()
 
 # We need a specific model file for MediaPipe to work. 
 # If it's not here, we'll just download it automatically.
->>>>>>> Stashed changes
 MODEL = "hand_landmarker.task"
 if not os.path.exists(MODEL):
     print("Downloading model...")
@@ -51,27 +48,8 @@ if not os.path.exists(MODEL):
 
 latest_result = None
 
-<<<<<<< Updated upstream
-
-def in_range(value, target, deviance):
-    if value <= target + deviance and value >= target - deviance:
-        return True
-    else:
-        return False
-async def main(host, port, values):
-    uri = f"ws://{host}:{port}/ws"
-    try:
-        async with websockets.connect(uri) as ws:
-            payload = [int(v) for v in values]
-            await ws.send(json.dumps(payload, separators=(",", ":")))
-            # print(f"Successfully sent {payload} to {uri}")
-    except Exception as e:
-        print(f"Failed to connect or send: {e}")
-
-=======
 # This callback is called every time the AI finishes processing a frame.
 # It updates our latest_result so the main loop can use it.
->>>>>>> Stashed changes
 def callback(result, output_image, timestamp_ms):
     global latest_result
     latest_result = result
