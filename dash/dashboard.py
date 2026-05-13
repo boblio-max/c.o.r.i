@@ -137,8 +137,41 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.JOYBUTTONDOWN or event.type == pygame.MOUSEBUTTONDOWN:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             x, y = pygame.mouse.get_pos()
+            # Check button collision for mouse clicks
+            ai_mode_rect = pygame.Rect(width//2 - 90, height - 75, 80, 30)
+            claw_rect = pygame.Rect(width//2 + 10, height - 75, 80, 30)
+            home_rect = pygame.Rect(width//2 - 90, height - 35, 80, 30)
+            pose_rect = pygame.Rect(width//2 + 10, height - 35, 80, 30)
+            
+            try:
+                if ai_mode_rect.collidepoint(x, y):
+                    is_clicked_ai = not is_clicked_ai
+                    logs.append("AI Mode " + ("Activated" if is_clicked_ai else "Deactivated"))
+                    red_button = DANGER if is_clicked_ai else PANEL_BG
+                    
+                elif claw_rect.collidepoint(x, y):
+                    is_clicked = not is_clicked
+                    logs.append("Claw Activated" if is_clicked else "Claw Deactivated")
+                    green_button = SUCCESS if is_clicked else PANEL_BG
+                    joint_angles[0] = 40.0 if is_clicked else 180.0
+                    
+                elif home_rect.collidepoint(x, y):
+                    logs.append("Robot returned to original location")
+                    blue_button = ACCENT_COLOR if not is_clicked2 else PANEL_BG
+                    is_clicked2 = not is_clicked2
+                    
+                elif pose_rect.collidepoint(x, y):
+                    logs.append("Predefined pose activated" if not is_clicked3 else "Predefined pose deactivated")
+                    yellow_button = WARNING if not is_clicked3 else PANEL_BG
+                    is_clicked3 = not is_clicked3
+                    joint_angles = [40.0, 110.0, 150.0, 80.0, 0.0, 0.0] if is_clicked3 else [180.0, 180.0, 90.0, 90.0, 0.0, 0.0]
+
+            except Exception:
+                pass
+                
+        elif event.type == pygame.JOYBUTTONDOWN:
             try:
                 if event.button == 0:
                     is_clicked = not is_clicked
