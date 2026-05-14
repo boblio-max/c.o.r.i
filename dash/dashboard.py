@@ -16,9 +16,15 @@ import websockets
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ik_solver import IKSolver
 from ws_client import PersistentWebSocketClient
-# Networking setup - change the HOST to your Pi's IP if you're running this live.
-HOST = "192.168.1.20" 
-PORT = 8765
+try:
+    from core.config import SERVER_HOST, SERVER_PORT
+except ImportError:
+    SERVER_HOST = "192.168.1.20"
+    SERVER_PORT = 8765
+
+# Networking setup - using centralized config
+HOST = SERVER_HOST 
+PORT = SERVER_PORT
 
 
 # This class handles the math for converting vectors into joint positions.

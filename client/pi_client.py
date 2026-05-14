@@ -6,15 +6,27 @@ import asyncio
 import json
 import logging
 import argparse
+import time
+import sys
+import os
 from typing import List
-
-# Third-party imports - websockets for talking, servokit for moving.
 import websockets
 from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
+
+# Add parent directory to path to import config
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from core.config import SERVER_HOST, SERVER_PORT, SERVO_INDICES, SAFE_POSE, SERVO_MIN_ANGLE, SERVO_MAX_ANGLE
+except ImportError:
+    logging.error("Could not import core.config. Please ensure you are running this from the c.o.r.i root directory or the client directory.")
+    sys.exit(1)
+
+# Third-party imports - websockets for talking, servokit for moving.
 
 # Set up logging so we can see what's happening in the terminal.
 LOG = logging.getLogger("pi_client")
 WS_PATH = "/ws"
+HEARTBEAT_TIMEOUT = 5.0  # Seconds before moving to safe pose if no data is received
 
 # We check if adafruit_servokit is installed. If not, we run in "dry-run" mode.
 # This is super helpful for testing on a laptop without the actual hardware.
@@ -22,34 +34,10 @@ try:
     from adafruit_servokit import ServoKit
 except ImportError:
     ServoKit = None
-    LOG.warning("adafruit_servokit not found. Actuation will be disabled.")
+    LOG.warning("adafruit_servokit not found. Actuation will be disabled (forced dry-run).")
 
-<<<<<<< Updated upstream
-# Servo channel mapping
-# Adjust these indices based on your servo setup
-SERVO_MAP = {
-    'base': 11,          # A1: Base rotation
-    'shoulder': 12,      # A2: Shoulder
-    'elbow': 13,         # A3: Elbow
-    'wrist': 14,         # A4: Wrist
-    'claw': 15,          # Claw/Grabber
-    'spare': 10          # Extra servo
-}
-
-SERVO_INDICES = [
-    SERVO_MAP['base'],
-    SERVO_MAP['shoulder'],
-    SERVO_MAP['elbow'],
-    SERVO_MAP['wrist'],
-    SERVO_MAP['claw'],
-    SERVO_MAP['spare']
-]
-
-
-=======
 # This function is where the physical movement happens.
 # It takes the joint values and applies them to the servos if we're not in dry-run mode.
->>>>>>> Stashed changes
 async def handle_payload(values: List[float], actuate: bool, kit: 'ServoKit | None'):
     """
     Handles the actual movement of servos based on received values.
@@ -68,28 +56,43 @@ async def handle_payload(values: List[float], actuate: bool, kit: 'ServoKit | No
             LOG.error("Actuation requested but ServoKit is not initialized")
             return
         
-<<<<<<< Updated upstream
         # Map values to servo indices and set angles
         for i, (v, servo_idx) in enumerate(zip(values, SERVO_INDICES)):
-            # Clamp angle to valid servo range (0-180)
-=======
-        # Map values to servo angles (clamped between 0 and 180 degrees).
-        for i, v in enumerate(values):
->>>>>>> Stashed changes
-            angle = max(0, min(180, int(v)))
+            # Clamp angle to valid servo range
+            angle = max(SERVO_MIN_ANGLE, min(SERVO_MAX_ANGLE, int(v)))
             try:
                 kit.servo[servo_idx].angle = angle
                 LOG.debug("Servo %d (index %s) set to %d°", i, servo_idx, angle)
             except Exception as e:
                 LOG.error("Failed to set servo %d to angle %d: %s", i, angle, e)
-        LOG.info("Actuated servos with %s", values)
+        LOG.debug("Actuated servos with %s", values)
     else:
-        LOG.info("Payload (dry-run): %s", values)
+        LOG.debug("Payload (dry-run): %s", values)
 
+async def safety_monitor(actuate_flag: bool, kit: 'ServoKit | None', last_msg_time: list):
+    """Monitors the heartbeat. If connection is lost or data stops, move to safe pose."""
+    moved_to_safe = False
+    while True:
+        await asyncio.sleep(1.0)
+        time_since_last = time.time() - last_msg_time[0]
+        
+        if time_since_last > HEARTBEAT_TIMEOUT:
+            if not moved_to_safe:
+                LOG.warning("No data received for %.1fs! Moving to SAFE POSE: %s", time_since_last, SAFE_POSE)
+                await handle_payload(SAFE_POSE, actuate_flag, kit)
+                moved_to_safe = True
+        else:
+            moved_to_safe = False
 
 async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: int):
     """Main WebSocket connection and message handling loop."""
     kit = ServoKit(channels=16) if ServoKit is not None else None
+    
+    # We use a list to pass by reference to the safety monitor
+    last_msg_time = [time.time()]
+    
+    # Start the safety monitor task
+    monitor_task = asyncio.create_task(safety_monitor(actuate_flag and not dry_run, kit, last_msg_time))
 
     backoff = 1
     while True:
@@ -105,6 +108,9 @@ async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: 
 
                 async for msg in ws:
                     try:
+                        # Update heartbeat timestamp
+                        last_msg_time[0] = time.time()
+                        
                         data = json.loads(msg)
                         
                         # Validation
@@ -113,7 +119,6 @@ async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: 
                             continue
                         
                         numbers = [float(x) for x in data]
-                        print("RECV:", numbers)
 
                         # Process movement
                         # Pass 'actuate_flag and not dry_run' to determine if physical movement happens
@@ -134,11 +139,10 @@ async def listen_loop(uri: str, actuate_flag: bool, dry_run: bool, max_backoff: 
         await asyncio.sleep(backoff)
         backoff = min(max_backoff, backoff * 2)
 
-
 def main():
     parser = argparse.ArgumentParser(description="Pi WebSocket client for 6-axis servo control")
-    parser.add_argument("--host", required=True, help="Server host IP")
-    parser.add_argument("--port", type=int, default=8765, help="Server port")
+    parser.add_argument("--host", default=SERVER_HOST, help="Server host IP")
+    parser.add_argument("--port", type=int, default=SERVER_PORT, help="Server port")
     parser.add_argument("--actuate", action="store_true", help="Enable hardware PWM")
     parser.add_argument("--dry-run", action="store_true", help="Log only, no movement")
     parser.add_argument("--max-backoff", type=int, default=30, help="Max reconnect delay")
@@ -156,7 +160,6 @@ def main():
         asyncio.run(listen_loop(uri, args.actuate, args.dry_run, args.max_backoff))
     except KeyboardInterrupt:
         LOG.info("Client stopped by user")
-
 
 if __name__ == "__main__":
     main()
