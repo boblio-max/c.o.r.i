@@ -182,6 +182,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     angles[0] = int(angles_dict['A1'])
                     angles[1] = int(angles_dict['A2'])
                     angles[2] = int(angles_dict['A3'])
+<<<<<<< Updated upstream
                     # If not rotating manually, update wrist from IK
                     if not is_rotating:
                         angles[3] = int(angles_dict['A4'])
@@ -192,6 +193,14 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     # Send payload safely without blocking the loop
                     ws_client.send(angles)
 
+=======
+                    angles[3] = int(angles_dict['A4'])
+                    joint_angles = angles
+                    try:
+                        asyncio.run(main(HOST, PORT, joint_angles))
+                    except Exception as e:
+                        pass
+>>>>>>> Stashed changes
                     if keys[pygame.K_r]:
                         is_rotating = True
                     if keys[pygame.K_s]:
