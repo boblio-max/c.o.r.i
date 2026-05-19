@@ -1,7 +1,4 @@
-# C.O.R.I Hand Tracking - Computer Vision Interface
-# This is the coolest part of the project! It uses your webcam to track your hand 
-# landmarks and converts your hand movements into robot joint commands.
-# It's basically like controlling the robot with "The Force".
+# C.O.R.I Hand Tracking
 
 import cv2
 import mediapipe as mp
@@ -18,8 +15,8 @@ import json
 
 # Add parent directory for ik_solver, config, and ws_client access.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ik_solver import IKSolver
-from ws_client import PersistentWebSocketClient
+from math.ik_solver import IKSolver
+from server.ws_client import PersistentWebSocketClient
 try:
     from core.config import SERVER_HOST, SERVER_PORT
 except ImportError:
@@ -182,25 +179,12 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     angles[0] = int(angles_dict['A1'])
                     angles[1] = int(angles_dict['A2'])
                     angles[2] = int(angles_dict['A3'])
-<<<<<<< Updated upstream
-                    # If not rotating manually, update wrist from IK
-                    if not is_rotating:
-                        angles[3] = int(angles_dict['A4'])
-                    
-                    # Ensure values are within 0-180 (optional normalization)
-                    angles = [max(0, min(180, a)) for a in angles]
-                    
-                    # Send payload safely without blocking the loop
-                    ws_client.send(angles)
-
-=======
                     angles[3] = int(angles_dict['A4'])
                     joint_angles = angles
                     try:
                         asyncio.run(main(HOST, PORT, joint_angles))
                     except Exception as e:
                         pass
->>>>>>> Stashed changes
                     if keys[pygame.K_r]:
                         is_rotating = True
                     if keys[pygame.K_s]:

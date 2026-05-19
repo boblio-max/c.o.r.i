@@ -14,8 +14,8 @@ import websockets
 # We need to add the parent directory to the path so we can grab the ik_solver.
 # It's a bit of a hack, but it works perfectly for our file structure.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ik_solver import IKSolver
-from ws_client import PersistentWebSocketClient
+from math.ik_solver import IKSolver
+from server.ws_client import PersistentWebSocketClient
 try:
     from core.config import SERVER_HOST, SERVER_PORT
 except ImportError:

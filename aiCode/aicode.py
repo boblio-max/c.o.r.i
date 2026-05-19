@@ -1,50 +1,46 @@
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
+# import base64
+# from g4f.client import Client
 
-import numpy as np
-import cv2
-import os
-import pandas as pd
-import ik_solver
-import ws_client
+# # 1. Read and base64‑encode your image file
+# if __name__ == "__main__":
+#     image_path = "C:\\Users\\2010436\\OneDrive - Northshore School District\\Documents\\GitHub\\c.o.r.i\\aiCode\\images\\Screenshot 2026-05-18 135651.png"  # change to your file
+#     with open(image_path, "rb") as f:
+#         image_bytes = f.read()
 
-SEQUENCE_LENGTH = 1          # number of frames per sample (start with 1)
-IMAGE_HEIGHT = 128
-IMAGE_WIDTH = 128
-NUM_CHANNELS = 3             # RGB
-OUTPUT_VECTOR_DIM = 6
+#     image_b64 = base64.b64encode(image_bytes).decode("utf-8")
 
-def build_video_vector_model(input_shape, output_dim):
-    model = keras.Sequential([
-        # Input: (sequence_length, H, W, C)
-        layers.Input(shape=input_shape),
+#     # 2. Build the message with text + image
+#     messages = [
+#         {
+#             "role": "user",
+#             "content": [
+#                 {
+#                     "type": "text",
+#                     "text": "Here is an image. imagine you are a robotic arm looking at this image. based on your position, Only create a 3d vector pointing to the object in the image, approzimate the z axis. the X axis is the width of the image and the Y axis is the height of the image. The Z axis is determined based on how far away the object is.",
+#                 },
+#                 {
+#                     "type": "image_url",
+#                     "image_url": {
+#                         # For local files, use a data URL with base64
+#                         "url": f"data:image/png;base64,{image_b64}",
+#                     },
+#                 },
+#             ],
+#         }
+#     ]
 
-        # TimeDistributed CNN (frame-wise feature extraction)
-        layers.TimeDistributed(layers.Conv2D(32, (3, 3), activation='relu')),
-        layers.TimeDistributed(layers.MaxPooling2D((2, 2))),
+#     # 3. Call g4f with gpt-4o-mini
+#     client = Client()
+#     response = client.chat.completions.create(
+#         model="gpt-4o-mini",
+#         messages=messages,
+#         web_search=False,
+#     )
 
-        layers.TimeDistributed(layers.Conv2D(64, (3, 3), activation='relu')),
-        layers.TimeDistributed(layers.MaxPooling2D((2, 2))),
 
-        layers.TimeDistributed(layers.Conv2D(128, (3, 3), activation='relu')),
-        layers.TimeDistributed(layers.MaxPooling2D((2, 2))),
-
-        # Flatten CNN output for each frame
-        layers.TimeDistributed(layers.Flatten()),
-
-        # LSTM across time (sequence of frame features)
-        layers.LSTM(128, activation='tanh'),
-
-        # Output: 6 angles (regression)
-        layers.Dense(output_dim, activation='linear')
-    ])
-    return model
-
-# Input shape: (SEQUENCE_LENGTH, H, W, C)
-input_shape = (SEQUENCE_LENGTH, IMAGE_HEIGHT, IMAGE_WIDTH, NUM_CHANNELS)
-
-model = build_video_vector_model(input_shape, OUTPUT_VECTOR_DIM)
-model.compile(optimizer='adam', loss='mse')
-model.summary()
-
+#     # 4. Print the generated code / answer
+#     print(response.choices[0].message.content)
+from ai4free import LEO
+from Helpingai_T2 import Perplexity
+leo = LEO()
+print(leo.chat("Hello"))

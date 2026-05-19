@@ -9,7 +9,7 @@ import os
 
 # Making sure we can find the ik_solver in the parent directory.
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from ik_solver import IKSolver
+from math.ik_solver import IKSolver
 
 # Initialize the IK Solver - this is what calculates the arm's math.
 solver = IKSolver(L=1.0)

@@ -1,3 +1,6 @@
+# Inverse Kinematics Solver for a 4-DOF Robotic Arm
+# Copied over from desmos math and adapted for python
+
 import numpy as np
 
 
@@ -130,7 +133,7 @@ class IKSolver:
             L * np.sin(A2 + A3 + A4)
         ])
 
-        # Return displacement vectors for visualization
+        
         v1 = B - A
         v2 = C - B
         v3 = D - C
