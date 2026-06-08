@@ -1,0 +1,65 @@
+List of Coding Files Written
+
+Filename Path
+
+Description
+
+aiCode/aicode.py
+AI routines and helper functions for model inference and processing.
+
+client/pi_client.py
+Raspberry Pi client for connecting to server and sending/receiving data.
+
+core/config.py
+Project configuration values and constants.
+
+dash/dashboard.py
+Web/dashboard server and UI routing for monitoring the system.
+
+ dash/3dvectors.py
+3D vector math utilities used by the dashboard and visualizations.
+
+ dash/errors.py
+Error handling and reporting utilities for the dashboard.
+
+ dash/orchestrator.py
+Coordinates data flow between dashboard components and services.
+
+hand_tracking/handtracking.py
+Hand-tracking algorithm and pipeline integration.
+
+hand_tracking/vector.py
+Vector math utilities specific to hand-tracking computations.
+
+joystickcontrol/joysticks.py
+Joystick input handling and mapping to control signals.
+
+joystickcontrol/vector.py
+Vector utilities used by joystick control code.
+
+joystickcontrol/tests.py
+Unit/integration tests for joystick control modules.
+
+math/ik_solver.py
+Inverse kinematics solver for robot arm positioning.
+
+misc/imgkitstuff.py
+Image generation/processing helpers and wrappers for imgkit.
+
+misc/tests.py
+Miscellaneous test scripts used during development.
+
+robot/visualizer.py
+Robot visualization utilities and rendering helpers.
+
+robot/robot_arm.urdf
+Robot description (URDF) model used by the visualizer and simulators.
+
+server/server.py
+Main server application entrypoint and HTTP/WebSocket handlers.
+
+server/ws_client.py
+WebSocket client used to connect to remote servers or clients.
+
+tools/send_once.py
+Small utility script to send a message/action exactly once.
