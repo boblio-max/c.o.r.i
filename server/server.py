@@ -1,7 +1,4 @@
-# C.O.R.I Communication Server
-# This is the central bridge. It sits in the middle and relays messages 
-# between the dashboard (or hand tracking) and the Raspberry Pi.
-# It's basically the mailman of the whole system.
+# WebSocket server that forwards 6-number payloads to a registered Pi client.
 
 import asyncio
 import json
@@ -156,6 +153,8 @@ class WSServer:
 
 # Convenience single-instance publisher that other modules can import:
 publisher = WSServer()
+
+# Import `publisher` and call `publish()` to send 6-number arrays to the Pi
 
 
 def main() -> None:

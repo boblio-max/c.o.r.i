@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+# Plot arm vectors in 3D for debugging IK and geometry.
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.animation as animation
@@ -110,4 +111,5 @@ class vector:
             'A4': np.degrees(A4),
         }
         
+        # Return joint angles in degrees
         return angles_deg

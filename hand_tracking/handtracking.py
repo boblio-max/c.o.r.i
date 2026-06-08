@@ -1,4 +1,4 @@
-# C.O.R.I Hand Tracking
+# Hand tracking using MediaPipe. Computes IK and sends joint angles to the robot.
 
 import cv2
 import mediapipe as mp
@@ -93,12 +93,15 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
+            # Camera gave no frame (disconnected or stream ended).
+            # Break the main loop so we can clean up resources nicely.
             break
 
         frame = cv2.flip(frame, 1)
         h, f_w = frame.shape[:2]
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb)
+        # Send frame to MediaPipe (async). Callback updates `latest_result`.
         landmarker.detect_async(mp_image, ts)
         ts += 1
         cv2.line(frame, (630, 360), (650, 360), (255, 0, 0), 2)
@@ -113,11 +116,14 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
 
                 keys = pygame.key.get_pressed()
                     
+                # Draws the landmarks on the hands
                 for c_a, c_b in CONNECTIONS:
                     cv2.line(frame, pts[c_a], pts[c_b], (0, 255, 0), 2)
                 for pt in pts:
                     cv2.circle(frame, pt, 4, (0, 0, 255), -1)
                 
+                # IF there are hands,
+                # get the points of each landmark and discern the claw rotation based on it
                 if pts:
                     x_coords = [p[0] for p in pts]
                     y_coords = [p[1] for p in pts]
@@ -182,8 +188,9 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
                     angles[3] = int(angles_dict['A4'])
                     joint_angles = angles
                     try:
+                        # Send joint angles to server; ignore network errors
                         asyncio.run(main(HOST, PORT, joint_angles))
-                    except Exception as e:
+                    except Exception:
                         pass
                     if keys[pygame.K_r]:
                         is_rotating = True
@@ -193,6 +200,7 @@ with vision.HandLandmarker.create_from_options(options) as landmarker:
         cv2.imshow("Hand Tracking", frame)
         pygame.display.flip()
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            # 'q' pressed by the user — quit the loop and teardown.
             break
 
 cap.release()

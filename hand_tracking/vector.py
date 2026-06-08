@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+# 3D vector visualizer for arm segments. Useful for debugging IK calculations.
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.animation as animation
@@ -103,6 +104,7 @@ class vector:
         self.quiver2.set_segments([[B, C]])
         self.quiver3.set_segments([[C, D]])  
 
+        # Return joint angles in degrees for external use
         angles_deg = {
             'A1': np.degrees(A1),
             'A2': np.degrees(A2),

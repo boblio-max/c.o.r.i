@@ -1,4 +1,5 @@
 import mujoco
+# MuJoCo visualizer for the robot arm. Use keyboard controls to adjust joints.
 import mujoco.viewer
 from pathlib import Path
 import msvcrt
@@ -20,6 +21,7 @@ data = mujoco.MjData(model)
 JOINT_STEP = 0.05
 CTRL_STEP = 0.1
 
+# Clamp selected joint index to the valid range of qpos
 def clamp_index(i):
     return max(0, min(i, int(data.qpos.size) - 1))
 
@@ -44,6 +46,7 @@ with mujoco.viewer.launch_passive(model, data) as viewer:
         if msvcrt.kbhit():
             ch = msvcrt.getwch()
             if ch == 'q':
+                # 'q' pressed: exit viewer loop
                 break
             if ch == 'r':
                 data.qpos[:] = 0.0

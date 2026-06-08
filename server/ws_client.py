@@ -10,6 +10,8 @@ import websockets
 logging.basicConfig(level=logging.INFO)
 LOG = logging.getLogger("ws_client")
 
+# Persistent background WebSocket client with auto-reconnect. Use `start()`/`send()`/`stop()`.
+
 
 class PersistentWebSocketClient:
     """
@@ -54,6 +56,7 @@ class PersistentWebSocketClient:
         self._thread = threading.Thread(target=self._run_event_loop, daemon=True)
         self._thread.start()
         LOG.info("WebSocket client starting (connecting to %s)", self.uri)
+        # Runs in a background thread and reconnects automatically
 
     def stop(self):
         """Stop the background connection thread."""
@@ -82,6 +85,7 @@ class PersistentWebSocketClient:
         except Exception as e:
             LOG.error("Failed to queue payload: %s", e)
             return False
+        # Payloads are queued and sent by the background event loop
 
     def is_connected(self) -> bool:
         """Check if currently connected to server."""

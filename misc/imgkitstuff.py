@@ -1,8 +1,10 @@
 import pygame
+# Render HTML to an image and display it in pygame (demo code).
 import imgkit
 from io import BytesIO
 
 def main():
+    # Path to wkhtmltoimage binary on Windows
     config = imgkit.config(wkhtmltoimage=r'C:\Program Files\wkhtmltopdf\bin\wkhtmltoimage.exe')
 
     pygame.init()

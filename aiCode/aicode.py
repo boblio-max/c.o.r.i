@@ -42,5 +42,7 @@
 #     print(response.choices[0].message.content)
 from ai4free import LEO
 from Helpingai_T2 import Perplexity
+# Experimental AI test script — quick playpen for chat/image helpers.
 leo = LEO()
+# Print model reply for a basic sanity check
 print(leo.chat("Hello"))

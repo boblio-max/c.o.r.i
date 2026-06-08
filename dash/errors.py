@@ -1,5 +1,4 @@
-# Error Handler - This keeps track of everything that could go wrong.
-# It's like a dictionary of robot "bad moods" and how to describe them.
+# Map error codes to human-readable messages.
 class Error:
     def __init__(self, type):
         self.type = type
@@ -17,6 +16,7 @@ class Error:
 
     # Placeholder for checking if an error is active.
     def isThrown(self:None) -> bool:
+        # Placeholder: real implementation should check actual error state
         return True
     
     # Grabs the actual error message based on the code.
@@ -25,3 +25,4 @@ class Error:
             return self.error_types[self.type]
         except KeyError:
             return self.error_types[1]
+        # If unknown code, return generic message

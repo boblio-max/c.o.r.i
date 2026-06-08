@@ -1,12 +1,10 @@
-# C.O.R.I Centralized Configuration
-# This file holds all the critical settings for the robot. 
-# Change these values here, and they will update across the entire system.
+# Central configuration: network settings, servo mapping, and safe pose.
 
-# --- NETWORK SETTINGS ---
-SERVER_HOST = "192.168.1.20"  # IP address of the server (or Pi, if running server there)
+# NETWORK SETTINGS
+SERVER_HOST = "192.168.1.20" 
 SERVER_PORT = 8765
 
-# --- HARDWARE SETTINGS (RASPBERRY PI) ---
+# HARDWARE SETTINGS (RASPBERRY PI)
 # Mapping of logical joints to physical PWM channels on the ServoKit
 SERVO_MAP = {
     'base': 11,          # A1: Base rotation
@@ -26,6 +24,8 @@ SERVO_INDICES = [
     SERVO_MAP['claw'],
     SERVO_MAP['spare']
 ]
+
+# Payload order used across the system: [base, shoulder, elbow, wrist, claw, spare]
 
 # The default "safe" pose the robot will return to if connection is lost.
 # [base, shoulder, elbow, wrist, claw, spare]

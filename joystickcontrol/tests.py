@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+# Demo plotting 3D vectors for testing and visualization.
 import numpy as np
 
 fig = plt.figure()
@@ -22,4 +23,5 @@ for i in range(10):
     ax.set_zlabel('Z')
     plt.title('3D Vector Plot')
 
+    # Display the plot window
     plt.show()

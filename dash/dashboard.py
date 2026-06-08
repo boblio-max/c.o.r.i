@@ -1,6 +1,4 @@
-# C.O.R.I Dashboard - The Main Control Hub
-# This script is basically the brain's visual interface. It uses Pygame to show us 
-# what's going on with the robot joints in real-time and lets us control it with a joystick.
+# Pygame dashboard displaying joint states and controls for the robot.
 
 import pygame
 import sys
@@ -51,6 +49,7 @@ vec = VectorCalculator(L=1.0)
 # Initialize WebSocket client
 ws_client = PersistentWebSocketClient(host=HOST, port=PORT)
 ws_client.start()
+# Background WebSocket client used to publish joint angles to the server
 
 # Initialize Pygame and Joystick
 pygame.init()

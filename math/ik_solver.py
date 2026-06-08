@@ -1,5 +1,5 @@
-# Inverse Kinematics Solver for a 4-DOF Robotic Arm
-# Copied over from desmos math and adapted for python
+# Inverse Kinematics solver for a 4-DOF robotic arm.
+# Computes joint angles for a given 3D target position.
 
 import numpy as np
 
@@ -77,6 +77,7 @@ class IKSolver:
             A4 = A3
 
         # Return angles in degrees
+        # Return joint angles in degrees: A1, A2, A3, A4
         return {
             'A1': float(np.degrees(A1)),
             'A2': float(np.degrees(A2)),

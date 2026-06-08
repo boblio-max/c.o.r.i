@@ -1,6 +1,5 @@
-# C.O.R.I Raspberry Pi Client
-# This script runs on the actual Pi. It listens for commands from the server
-# and then tells the servos exactly how to move. It's the robot's nervous system!
+# Raspberry Pi client: listens for 6-number messages and actuates servos.
+# Use `--dry-run` to log only without moving hardware.
 
 import asyncio
 import json
@@ -27,6 +26,7 @@ except ImportError:
 LOG = logging.getLogger("pi_client")
 WS_PATH = "/ws"
 HEARTBEAT_TIMEOUT = 5.0  # Seconds before moving to safe pose if no data is received
+# If no messages arrive within HEARTBEAT_TIMEOUT, move to SAFE_POSE
 
 # We check if adafruit_servokit is installed. If not, we run in "dry-run" mode.
 # This is super helpful for testing on a laptop without the actual hardware.

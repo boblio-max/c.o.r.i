@@ -1,4 +1,5 @@
 import pygame
+# Simple joystick-to-servo demo. Maps joystick Y axis to one servo angle.
 import time
 from adafruit_servokit import ServoKit
 
@@ -19,6 +20,7 @@ while True:
     y = joystick.get_axis(1)
     
     # Map -1 to 1 → 0 to 180
+    # Map joystick axis [-1,1] to servo angle [0,180]
     angle = (y + 1) / 2 * 180
     
     kit.servo[15].angle = angle

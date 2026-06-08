@@ -1,6 +1,4 @@
-# C.O.R.I 3D Vector Visualizer
-# This script is a super cool 3D renderer that helps us see the robot's target 
-# and its actual arm segments in a simulated 3D space. It's like a mini CAD view!
+# 3D vector visualizer: projects vectors to 2D for inspection of IK results.
 
 import pygame
 import numpy as np
@@ -41,8 +39,7 @@ x = 0.5  # Movement step
 x_val, y_val, z_val = 0.5, 0.5, 0.5
 n = (x_val, y_val, z_val)
 
-# The "Project" function is where the 3D magic happens.
-# It takes a 3D point and flattens it onto our 2D screen using rotation matrices.
+# This takes a 3D point and flattens it onto our 2D screen using rotation matrices.
 # Rotation matrices are essentially just a bunch of trig that rotates points around an axis.
 def project(vector, angle_x, angle_y):
     # Y-axis rotation (left/right)
@@ -134,6 +131,9 @@ while running:
 
     a, b, c = solver.update_vect(n)
     
+    # Drawing vectors
+    # first 6 are axes
+    # next are arm vectors
     vectors = [
             {'color': (255, 0, 0), 'vec': np.array([100 * scale, 0, 0])},   # X (Red)
             {'color': (0, 255, 0), 'vec': np.array([0, 100 * scale, 0])},   # Y (Green)
@@ -143,6 +143,9 @@ while running:
             {'color': (0, 0, 255), 'vec': np.array([0, 0, -100 * scale])},   # Z (Blue)
             {'color': (255, 255, 255), 'vec': np.array([x_val* 40 * scale, y_val * 40 * scale, z_val * 40 * scale])}
         ]
+    
+    # If the vectors are toggled to be shown
+    # the arm vectors are added to the end
     if is_shown:
         vectors = [
             {'color': (255, 0, 0), 'vec': np.array([100 * scale, 0, 0])},   # X (Red)
@@ -173,9 +176,12 @@ while running:
     # 4. Drawing
     screen.fill((20, 20, 20))
     origin = (int(width/2), int(height/2))
-    center = origin  # Keep track of center for arm vectors
+    # Keep track of center for arm vectors
+    center = origin  
+   
     i = 0
-    accumulated_vec = np.array([0.0, 0.0, 0.0])  # For chaining arm vectors
+    # For chaining arm vectors
+    accumulated_vec = np.array([0.0, 0.0, 0.0])  
     arm_start = center
     for v_info in vectors:
         i += 1
@@ -194,6 +200,7 @@ while running:
             pygame.draw.circle(screen, v_info['color'], end_pos, 5)
             if i > 6:
                 origin = end_pos
+    # End of frame drawing
     pygame.display.flip()
 
 pygame.quit()

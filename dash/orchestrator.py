@@ -1,12 +1,10 @@
 # C.O.R.I Orchestrator
-# This is the "Grand Conductor" of our project. Instead of opening multiple 
-# terminal windows, we just run this one script and it launches everything. 
+# Launches the dashboard and 3D visualizer as subprocesses.
 import subprocess
 import os
 import sys
 
 if __name__ == "__main__":
-    # First, we figure out where we are so we can find the other scripts.
     script_dir = os.path.dirname(os.path.abspath(__file__))
     
     # We're launching the 3D visualizer and the main Dashboard simultaneously.
@@ -24,8 +22,8 @@ if __name__ == "__main__":
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
-    
-    # Now we just wait. If either one closes, the whole band stops.
+    # Note: stdout/stderr are captured. Set to None to see live output in this terminal.
+
     print("[Orchestrator] All systems running. Close any window to exit.")
     vectors_process.wait()
     dashboard_process.wait()

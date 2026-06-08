@@ -1,3 +1,4 @@
+# Read joystick input, compute IK, and optionally actuate servos.
 import pygame
 # from adafruit_servokit import ServoKit
 import time
@@ -97,6 +98,7 @@ while running:
             
             # print("3D Vector:", vector1)
             vector_pass = f"{vector1[0]} {vector1[1]} {vector1[2]}"
+            # Format vector as 'x y z' for the IK solver
             angles = ik_solver.update(vector_pass)
             print(vector_pass)
             # print("Servo Angles:", angles)
